@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Producto | WAEY</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .product-detail-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    /* Gallery */
+    .gallery-wrap { position: sticky; top: 80px; }
+    .gallery-main {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--light);
+      margin-bottom: 12px;
+      position: relative;
+    }
+    .gallery-main img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s;
+    }
+    .gallery-thumbs {
+      display: flex;
+      gap: 10px;
+    }
+    .gallery-thumb {
+      width: 72px;
+      height: 72px;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      background: var(--light);
+    }
+    .gallery-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .gallery-thumb.active, .gallery-thumb:hover {
+      border-color: var(--orange);
+    }
+    /* Product info panel */
+    .product-detail-info {
+      padding-top: 8px;
+    }
+    .product-detail-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--orange-bg);
+      color: var(--orange);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+    }
+    .product-detail-info h1 {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+    .product-detail-rating {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+    .product-detail-price-wrap {
+      margin-bottom: 20px;
+      padding: 16px 20px;
+      background: var(--light);
+      border-radius: var(--radius);
+    }
+    .product-detail-price {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--orange);
+    }
+    .product-detail-price-old {
+      font-size: 18px;
+      color: var(--gray);
+      text-decoration: line-through;
+      margin-left: 10px;
+    }
+    .product-discount-badge {
+      display: inline-block;
+      background: var(--orange);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 20px;
+      margin-left: 10px;
+    }
+    .product-detail-desc {
+      font-size: 15px;
+      color: var(--gray);
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .product-features {
+      list-style: none;
+      margin-bottom: 24px;
+    }
+    .product-features li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .product-features li:last-child { border-bottom: none; }
+    .product-features li i { color: var(--orange); font-size: 12px; }
+    /* Qty selector */
+    .qty-selector {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      width: fit-content;
+    }
+    .qty-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: var(--light);
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .qty-btn:hover { background: var(--orange-bg); color: var(--orange); }
+    .qty-input {
+      width: 52px;
+      height: 40px;
+      text-align: center;
+      border: none;
+      border-left: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+    }
+    .qty-input:focus { outline: none; }
+    .add-cart-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .btn-add-cart {
+      flex: 1;
+      min-width: 200px;
+      padding: 14px 24px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-add-cart:hover { background: var(--orange-dark); }
+    .btn-whatsapp-direct {
+      padding: 14px 20px;
+      background: #25D366;
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .btn-whatsapp-direct:hover { background: #1ebe5d; }
+    .stock-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+    .stock-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2ecc71;
+    }
+    .stock-dot.low { background: #f39c12; }
+    .stock-dot.out { background: #e74c3c; }
+    /* Tabs */
+    .product-tabs {
+      margin-top: 48px;
+    }
+    .tabs-header {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 28px;
+      gap: 0;
+    }
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--gray);
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: var(--orange);
+      border-bottom-color: var(--orange);
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    /* Reviews */
+    .review-form {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 32px;
+    }
+    .review-form h3 { margin-bottom: 16px; font-size: 17px; }
+    .form-row { margin-bottom: 14px; }
+    .form-row label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--black);
+    }
+    .form-row input, .form-row textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      background: #fff;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .form-row input:focus, .form-row textarea:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+    .form-row textarea { min-height: 90px; resize: vertical; }
+    .star-picker {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+    .star-picker span {
+      font-size: 28px;
+      cursor: pointer;
+      color: #ddd;
+      transition: color 0.1s;
+      line-height: 1;
+    }
+    .star-picker span.selected, .star-picker span.hover {
+      color: #f39c12;
+    }
+    .reviews-list { }
+    .review-card {
+      padding: 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      background: #fff;
+    }
+    .review-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .review-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .review-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--orange);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .review-author-name { font-weight: 700; font-size: 14px; }
+    .review-date { font-size: 12px; color: var(--gray); margin-top: 2px; }
+    .review-text { font-size: 14px; color: #444; line-height: 1.6; margin-top: 8px; }
+    .review-empty {
+      text-align: center;
+      padding: 40px;
+      color: var(--gray);
+      font-size: 14px;
+    }
+    /* Related products */
+    .related-section { margin-top: 56px; }
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 28px;
+    }
+    .breadcrumb a { color: var(--gray); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--orange); }
+    .breadcrumb span { color: var(--orange); font-weight: 600; }
+    @media (max-width: 900px) {
+      .product-detail-layout { grid-template-columns: 1fr; gap: 24px; }
+      .gallery-wrap { position: static; }
+      .product-detail-info h1 { font-size: 22px; }
+    }
+    @media (max-width: 600px) {
+      .gallery-thumbs { gap: 6px; }
+      .gallery-thumb { width: 56px; height: 56px; }
+      .product-detail-price { font-size: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  🚚 Envíos a todo el país &nbsp;|&nbsp; 📦 Envío gratis en compras mayores a $50.000 &nbsp;|&nbsp;
+  <a href="https://wa.me/5491100000000">💬 WhatsApp</a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">WAEY</a>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Buscar productos..." autocomplete="off">
+      <button onclick="doSearch()"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="header-actions">
+      <a href="tienda.html">
+        <i class="fas fa-store"></i>
+        <span>Tienda</span>
+      </a>
+      <a href="carrito.html">
+        <div class="cart-icon-wrap">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-count" style="display:none">0</span>
+        </div>
+        <span>Carrito</span>
+      </a>
+      <a href="admin.html">
+        <i class="fas fa-user-shield"></i>
+        <span>Admin</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="main-nav">
+  <div class="nav-inner">
+    <a href="tienda.html">Todos</a>
+    <a href="tienda.html?cat=botellas">🧴 Botellas y Termos</a>
+    <a href="tienda.html?cat=mochilas">🎒 Mochilas</a>
+    <a href="tienda.html?cat=carteras">👜 Carteras y Bolsos</a>
+    <a href="tienda.html?cat=valijas">🧳 Valijas y Viaje</a>
+    <a href="tienda.html?badge=sale" style="color:var(--orange-light)">🔥 Ofertas</a>
+  </div>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="section">
+  <div class="container">
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb" id="breadcrumb">
+      <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
+      <i class="fas fa-chevron-right" style="font-size:10px"></i>
+      <a href="tienda.html">Tienda</a>
+      <i class="fas fa-chevron-right" style="font-size:10px"></i>
+      <span id="bc-product">Cargando...</span>
+    </div>
+
+    <!-- PRODUCT DETAIL -->
+    <div class="product-detail-layout" id="product-detail">
+      <div style="text-align:center;padding:60px;grid-column:1/-1;color:var(--gray)">
+        <i class="fas fa-spinner fa-spin" style="font-size:40px"></i>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="product-tabs" id="product-tabs" style="display:none">
+      <div class="tabs-header">
+        <button class="tab-btn active" onclick="openTab('reviews')">
+          <i class="fas fa-star"></i> Reseñas (<span id="review-count">0</span>)
+        </button>
+        <button class="tab-btn" onclick="openTab('shipping')">
+          <i class="fas fa-truck"></i> Envíos
+        </button>
+        <button class="tab-btn" onclick="openTab('returns')">
+          <i class="fas fa-undo"></i> Devoluciones
+        </button>
+      </div>
+
+      <!-- REVIEWS TAB -->
+      <div class="tab-content active" id="tab-reviews">
+        <!-- Review form -->
+        <div class="review-form">
+          <h3>💬 Dejá tu reseña</h3>
+          <div class="star-picker" id="star-picker">
+            <span data-val="1">★</span>
+            <span data-val="2">★</span>
+            <span data-val="3">★</span>
+            <span data-val="4">★</span>
+            <span data-val="5">★</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div class="form-row">
+              <label>Tu nombre *</label>
+              <input type="text" id="review-name" placeholder="Ej: María García">
+            </div>
+            <div class="form-row">
+              <label>Email (opcional)</label>
+              <input type="email" id="review-email" placeholder="tu@email.com">
+            </div>
+          </div>
+          <div class="form-row">
+            <label>Tu comentario *</label>
+            <textarea id="review-text" placeholder="¿Qué te pareció el producto? ¿Lo recomendarías?"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="submitReview()">
+            <i class="fas fa-paper-plane"></i> Publicar reseña
+          </button>
+        </div>
+        <!-- Reviews list -->
+        <div class="reviews-list" id="reviews-list">
+          <div class="review-empty">Sé el primero en dejar una reseña.</div>
+        </div>
+      </div>
+
+      <!-- SHIPPING TAB -->
+      <div class="tab-content" id="tab-shipping">
+        <div style="max-width:600px">
+          <h3 style="margin-bottom:16px">🚚 Información de envíos</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="padding:16px;border:1px solid var(--border);border-radius:var(--radius);display:flex;gap:12px;align-items:flex-start">
+              <span style="font-size:24px">📦</span>
+              <div>
+                <strong>Envío estándar</strong>
+                <p style="font-size:14px;color:var(--gray);margin-top:4px">3 a 7 días hábiles. Disponible en todo el país a través de Correo Argentino o Andreani.</p>
+              </div>
+            </div>
+            <div style="padding:16px;border:1px solid var(--border);border-radius:var(--radius);display:flex;gap:12px;align-items:flex-start">
+              <span style="font-size:24px">🚀</span>
+              <div>
+                <strong>Envío express (CABA y GBA)</strong>
+                <p style="font-size:14px;color:var(--gray);margin-top:4px">24 a 48 horas hábiles. Solo para Capital Federal y Gran Buenos Aires.</p>
+              </div>
+            </div>
+            <div style="padding:16px;background:var(--orange-bg);border-radius:var(--radius);display:flex;gap:12px;align-items:flex-start">
+              <span style="font-size:24px">🎁</span>
+              <div>
+                <strong style="color:var(--orange)">Envío GRATIS en compras mayores a $50.000</strong>
+                <p style="font-size:14px;color:var(--gray);margin-top:4px">Aplica para envío estándar en todo el país.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RETURNS TAB -->
+      <div class="tab-content" id="tab-returns">
+        <div style="max-width:600px">
+          <h3 style="margin-bottom:16px">🔄 Política de cambios y devoluciones</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="padding:16px;border:1px solid var(--border);border-radius:var(--radius)">
+              <strong>30 días para cambios</strong>
+              <p style="font-size:14px;color:var(--gray);margin-top:4px">Aceptamos cambios dentro de los 30 días de recibido el producto, siempre que se encuentre en su estado original con etiquetas.</p>
+            </div>
+            <div style="padding:16px;border:1px solid var(--border);border-radius:var(--radius)">
+              <strong>Devolución de dinero</strong>
+              <p style="font-size:14px;color:var(--gray);margin-top:4px">Si el producto presenta defectos de fábrica, realizamos la devolución completa del dinero o el cambio por otro producto.</p>
+            </div>
+            <div style="padding:16px;border:1px solid var(--border);border-radius:var(--radius)">
+              <strong>¿Cómo iniciarlo?</strong>
+              <p style="font-size:14px;color:var(--gray);margin-top:4px">Contactanos por WhatsApp con tu número de pedido y te guiamos en el proceso.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATED PRODUCTS -->
+    <div class="related-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">También te puede <span>interesar</span></h2>
+        </div>
+        <a href="tienda.html" class="btn btn-outline btn-sm">Ver todos</a>
+      </div>
+      <div class="products-grid" id="related-products"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">WAEY</div>
+        <p>Tu tienda de confianza para botellas, mochilas, carteras y valijas. Calidad y estilo para tu vida cotidiana.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="https://wa.me/5491100000000"><i class="fab fa-whatsapp"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Productos</h4>
+        <ul>
+          <li><a href="tienda.html?cat=botellas">Botellas y Termos</a></li>
+          <li><a href="tienda.html?cat=mochilas">Mochilas</a></li>
+          <li><a href="tienda.html?cat=carteras">Carteras y Bolsos</a></li>
+          <li><a href="tienda.html?cat=valijas">Valijas y Viaje</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Información</h4>
+        <ul>
+          <li><a href="#">Sobre WAEY</a></li>
+          <li><a href="#">Envíos y Plazos</a></li>
+          <li><a href="#">Cambios y Devoluciones</a></li>
+          <li><a href="#">Medios de Pago</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="https://wa.me/5491100000000">💬 WhatsApp</a></li>
+          <li><a href="mailto:hola@waey.com.ar">📧 hola@waey.com.ar</a></li>
+          <li><a href="#">📍 Argentina</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 WAEY. Todos los derechos reservados.</span>
+      <span>Hecho con ❤️ en Argentina</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app.js"></script>
+<script>
+  let product = null;
+  let selectedRating = 0;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    if (!id) { window.location.href = 'tienda.html'; return; }
+
+    await _ensureCategoriesLoaded();
+    product = await DB.getProduct(id);
+    if (!product) { window.location.href = 'tienda.html'; return; }
+
+    // Update page title
+    document.title = `${product.name} | WAEY`;
+
+    // Breadcrumb
+    document.getElementById('bc-product').textContent = product.name;
+
+    // Render product
+    await renderProduct();
+
+    // Show tabs
+    document.getElementById('product-tabs').style.display = 'block';
+
+    // Load reviews
+    await loadReviews();
+
+    // Related products
+    await loadRelated();
+
+    // Star picker events
+    initStarPicker();
+  });
+
+  async function renderProduct() {
+    const discount = product.oldPrice ? Math.round((1 - product.price / product.oldPrice) * 100) : null;
+    const badgeLabels = { sale: '🔥 Oferta', new: '✨ Nuevo' };
+    const config = await DB.getConfig();
+
+    const imagesHTML = product.images.map((img, i) => `
+      <div class="gallery-thumb ${i === 0 ? 'active' : ''}" onclick="changeImage(${i})" data-index="${i}">
+        <img src="${img}" alt="${product.name} foto ${i+1}">
+      </div>
+    `).join('');
+
+    const featuresHTML = product.features && product.features.length
+      ? `<ul class="product-features">${product.features.map(f => `<li><i class="fas fa-check-circle"></i> ${f}</li>`).join('')}</ul>`
+      : '';
+
+    const stockClass = product.stock > 10 ? '' : product.stock > 0 ? 'low' : 'out';
+    const stockText = product.stock > 10 ? `Stock disponible (${product.stock} unidades)` :
+                      product.stock > 0 ? `¡Últimas ${product.stock} unidades!` : 'Sin stock';
+
+    const waMsg = encodeURIComponent(`¡Hola! Estoy interesado/a en el producto *${product.name}* ($${Number(product.price).toLocaleString('es-AR')}). ¿Podrían darme más información?`);
+
+    document.getElementById('product-detail').innerHTML = `
+      <!-- GALLERY -->
+      <div class="gallery-wrap">
+        <div class="gallery-main">
+          <img id="gallery-main-img" src="${product.images[0]}" alt="${product.name}">
+        </div>
+        <div class="gallery-thumbs">
+          ${imagesHTML}
+        </div>
+      </div>
+
+      <!-- INFO -->
+      <div class="product-detail-info">
+        ${product.badge ? `<div class="product-detail-badge">${badgeLabels[product.badge] || product.badge}</div>` : ''}
+        <div style="font-size:12px;color:var(--gray);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:6px">
+          ${getCategoryLabel(product.category)}
+        </div>
+        <h1>${product.name}</h1>
+
+        <div class="product-detail-rating">
+          ${starsHTML(product.rating, false)}
+          <span style="font-weight:700">${product.rating}</span>
+          <span style="color:var(--gray)">(${product.reviews} reseñas)</span>
+          <span style="color:var(--border)">|</span>
+          <span style="color:var(--gray)">Código: ${product.id}</span>
+        </div>
+
+        <div class="product-detail-price-wrap">
+          <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:4px">
+            <span class="product-detail-price">${formatPrice(product.price)}</span>
+            ${product.oldPrice ? `<span class="product-detail-price-old">${formatPrice(product.oldPrice)}</span>` : ''}
+            ${discount ? `<span class="product-discount-badge">-${discount}%</span>` : ''}
+          </div>
+          ${product.oldPrice ? `<div style="font-size:13px;color:var(--orange);font-weight:600;margin-top:4px">Ahorrás ${formatPrice(product.oldPrice - product.price)}</div>` : ''}
+        </div>
+
+        <p class="product-detail-desc">${product.description}</p>
+
+        ${featuresHTML}
+
+        <div class="stock-indicator">
+          <span class="stock-dot ${stockClass}"></span>
+          <span style="font-size:13px;font-weight:600;color:${product.stock === 0 ? '#e74c3c' : product.stock <= 10 ? '#f39c12' : '#2ecc71'}">${stockText}</span>
+        </div>
+
+        ${product.stock > 0 ? `
+        <div class="add-cart-section">
+          <div class="qty-selector">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input class="qty-input" type="number" id="qty-input" value="1" min="1" max="${product.stock}">
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+          </div>
+          <button class="btn-add-cart" onclick="addToCart()">
+            <i class="fas fa-shopping-bag"></i> Agregar al carrito
+          </button>
+        </div>
+        <a href="https://wa.me/${config.whatsapp}?text=${waMsg}" target="_blank" class="btn-whatsapp-direct" style="display:inline-flex;margin-bottom:20px;width:fit-content">
+          <i class="fab fa-whatsapp"></i> Consultar por WhatsApp
+        </a>
+        ` : `
+        <div style="padding:14px;background:#ffeaea;border-radius:var(--radius);color:#c0392b;font-weight:600;margin-bottom:20px">
+          ❌ Producto sin stock
+        </div>
+        `}
+
+        <div style="display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--gray)">
+          <span><i class="fas fa-truck" style="color:var(--orange)"></i> Envío a todo el país</span>
+          <span><i class="fas fa-shield-alt" style="color:var(--orange)"></i> Compra protegida</span>
+          <span><i class="fas fa-undo" style="color:var(--orange)"></i> 30 días para cambios</span>
+        </div>
+      </div>
+    `;
+  }
+
+  function changeImage(index) {
+    document.getElementById('gallery-main-img').src = product.images[index];
+    document.querySelectorAll('.gallery-thumb').forEach((t, i) => {
+      t.classList.toggle('active', i === index);
+    });
+  }
+
+  function changeQty(delta) {
+    const input = document.getElementById('qty-input');
+    let val = parseInt(input.value) + delta;
+    val = Math.max(1, Math.min(product.stock, val));
+    input.value = val;
+  }
+
+  function addToCart() {
+    const qty = parseInt(document.getElementById('qty-input').value) || 1;
+    Cart.add(product.id, qty);
+  }
+
+  // Reviews
+  async function loadReviews() {
+    const reviews = await DB.getReviews(product.id);
+    document.getElementById('review-count').textContent = reviews.length;
+
+    const list = document.getElementById('reviews-list');
+    if (reviews.length === 0) {
+      list.innerHTML = '<div class="review-empty">Sé el primero en dejar una reseña ⭐</div>';
+      return;
+    }
+    list.innerHTML = reviews.map(r => `
+      <div class="review-card">
+        <div class="review-header">
+          <div class="review-author">
+            <div class="review-avatar">${(r.name || '?').charAt(0).toUpperCase()}</div>
+            <div>
+              <div class="review-author-name">${r.name || 'Anónimo'}</div>
+              <div class="review-date">${r.date}</div>
+            </div>
+          </div>
+          <div>${starsHTML(r.rating, false)}</div>
+        </div>
+        <p class="review-text">${r.text || ''}</p>
+      </div>
+    `).join('');
+  }
+
+  function initStarPicker() {
+    const stars = document.querySelectorAll('#star-picker span');
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        selectedRating = parseInt(star.dataset.val);
+        updateStarPicker(selectedRating);
+      });
+      star.addEventListener('mouseenter', () => updateStarPicker(parseInt(star.dataset.val), true));
+      star.addEventListener('mouseleave', () => updateStarPicker(selectedRating));
+    });
+  }
+
+  function updateStarPicker(val, hover = false) {
+    document.querySelectorAll('#star-picker span').forEach((s, i) => {
+      s.classList.toggle(hover ? 'hover' : 'selected', i < val);
+      if (!hover) s.classList.remove('hover');
+    });
+  }
+
+  async function submitReview() {
+    const name = document.getElementById('review-name').value.trim();
+    const text = document.getElementById('review-text').value.trim();
+    if (!name) { showToast('Por favor ingresá tu nombre', 'error'); return; }
+    if (!text) { showToast('Por favor escribí tu comentario', 'error'); return; }
+    if (!selectedRating) { showToast('Por favor seleccioná una puntuación', 'error'); return; }
+
+    try {
+      await DB.addReview(product.id, { name, text, rating: selectedRating });
+    } catch (e) {
+      console.error(e);
+      showToast('No se pudo publicar la reseña', 'error');
+      return;
+    }
+
+    // Reset form
+    document.getElementById('review-name').value = '';
+    document.getElementById('review-email').value = '';
+    document.getElementById('review-text').value = '';
+    selectedRating = 0;
+    updateStarPicker(0);
+
+    await loadReviews();
+    showToast('¡Gracias por tu reseña! 🌟', 'success');
+  }
+
+  function openTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    event.target.closest('.tab-btn').classList.add('active');
+  }
+
+  async function loadRelated() {
+    const all = (await DB.getProducts()).filter(p => p.active && p.id !== product.id);
+    const sameCat = all.filter(p => p.category === product.category);
+    const related = [...sameCat, ...all.filter(p => p.category !== product.category)]
+      .slice(0, 4);
+    document.getElementById('related-products').innerHTML = related.map(renderProductCard).join('');
+  }
+
+  function doSearch() {
+    const q = document.getElementById('search-input').value.trim();
+    if (q) window.location.href = `tienda.html?q=${encodeURIComponent(q)}`;
+  }
+  document.getElementById('search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+</script>
+</body>
+</html>

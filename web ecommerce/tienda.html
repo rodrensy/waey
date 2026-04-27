@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda | WAEY</title>
+  <meta name="description" content="Explorá toda la colección WAEY: botellas térmicas, mochilas, carteras y valijas.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .shop-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+    .shop-sidebar {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      position: sticky;
+      top: 80px;
+    }
+    .sidebar-section {
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+    .sidebar-section h4 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--gray);
+      margin-bottom: 14px;
+    }
+    .cat-filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      text-align: left;
+      padding: 9px 12px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: var(--font);
+      cursor: pointer;
+      color: var(--black);
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .cat-filter-btn:hover {
+      background: var(--orange-bg);
+      color: var(--orange);
+    }
+    .cat-filter-btn.active {
+      background: var(--orange);
+      color: #fff;
+    }
+    .cat-filter-btn .cat-count {
+      margin-left: auto;
+      background: var(--light);
+      border-radius: 20px;
+      padding: 1px 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .cat-filter-btn.active .cat-count {
+      background: rgba(255,255,255,0.25);
+    }
+    .price-inputs {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .price-inputs input {
+      width: 100%;
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--font);
+    }
+    .price-inputs input:focus {
+      outline: none;
+      border-color: var(--orange);
+    }
+    .price-inputs span { color: var(--gray); font-size: 12px; }
+    .badge-filters {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .badge-filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      font-family: var(--font);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    .badge-filter-btn:hover { border-color: var(--orange); color: var(--orange); }
+    .badge-filter-btn.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+    /* Shop toolbar */
+    .shop-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 14px 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .shop-toolbar .results-count {
+      font-size: 14px;
+      color: var(--gray);
+    }
+    .shop-toolbar .results-count strong {
+      color: var(--black);
+    }
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .sort-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: var(--font);
+      background: #fff;
+      cursor: pointer;
+    }
+    .sort-select:focus { outline: none; border-color: var(--orange); }
+    .view-btns { display: flex; gap: 4px; }
+    .view-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--gray);
+      transition: all 0.2s;
+    }
+    .view-btn.active, .view-btn:hover {
+      background: var(--orange);
+      color: #fff;
+      border-color: var(--orange);
+    }
+    .products-grid.list-view {
+      grid-template-columns: 1fr;
+    }
+    .products-grid.list-view .product-card {
+      display: flex;
+      flex-direction: row;
+    }
+    .products-grid.list-view .product-img-wrap {
+      width: 200px;
+      min-width: 200px;
+      height: 200px;
+      border-radius: var(--radius) 0 0 var(--radius);
+    }
+    .products-grid.list-view .product-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 20px 24px;
+    }
+    /* Active filter chips */
+    .active-filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--orange-bg);
+      color: var(--orange);
+      border: 1px solid var(--orange-light);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .filter-chip:hover { background: var(--orange); color: #fff; }
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--gray);
+    }
+    .empty-state i {
+      font-size: 64px;
+      margin-bottom: 16px;
+      display: block;
+      opacity: 0.3;
+    }
+    .empty-state h3 { font-size: 20px; margin-bottom: 8px; color: var(--black); }
+    /* Breadcrumb */
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--gray);
+      margin-bottom: 24px;
+    }
+    .breadcrumb a { color: var(--gray); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--orange); }
+    .breadcrumb span { color: var(--orange); font-weight: 600; }
+    /* Mobile filter toggle */
+    .filter-toggle-btn {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: var(--font);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 900px) {
+      .shop-layout { grid-template-columns: 1fr; }
+      .shop-sidebar { position: static; display: none; }
+      .shop-sidebar.open { display: block; }
+      .filter-toggle-btn { display: flex; }
+    }
+    @media (max-width: 600px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .products-grid.list-view { grid-template-columns: 1fr; }
+      .products-grid.list-view .product-img-wrap { width: 130px; min-width: 130px; height: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  🚚 Envíos a todo el país &nbsp;|&nbsp; 📦 Envío gratis en compras mayores a $50.000 &nbsp;|&nbsp;
+  <a href="https://wa.me/5491100000000">💬 WhatsApp</a>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <a href="index.html" class="logo">WAEY</a>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Buscar botellas, mochilas, valijas..." autocomplete="off">
+      <button onclick="doSearch()"><i class="fas fa-search"></i></button>
+    </div>
+    <div class="header-actions">
+      <a href="tienda.html" class="active-link">
+        <i class="fas fa-store"></i>
+        <span>Tienda</span>
+      </a>
+      <a href="carrito.html">
+        <div class="cart-icon-wrap">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-count" style="display:none">0</span>
+        </div>
+        <span>Carrito</span>
+      </a>
+      <a href="admin.html">
+        <i class="fas fa-user-shield"></i>
+        <span>Admin</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="main-nav">
+  <div class="nav-inner">
+    <a href="tienda.html" id="nav-all">Todos</a>
+    <a href="tienda.html?cat=botellas" id="nav-botellas">🧴 Botellas y Termos</a>
+    <a href="tienda.html?cat=mochilas" id="nav-mochilas">🎒 Mochilas</a>
+    <a href="tienda.html?cat=carteras" id="nav-carteras">👜 Carteras y Bolsos</a>
+    <a href="tienda.html?cat=valijas" id="nav-valijas">🧳 Valijas y Viaje</a>
+    <a href="tienda.html?badge=sale" id="nav-sale" style="color:var(--orange-light)">🔥 Ofertas</a>
+  </div>
+</nav>
+
+<!-- PAGE CONTENT -->
+<div class="section">
+  <div class="container">
+
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+      <a href="index.html"><i class="fas fa-home"></i> Inicio</a>
+      <i class="fas fa-chevron-right" style="font-size:10px"></i>
+      <span id="breadcrumb-current">Todos los productos</span>
+    </div>
+
+    <!-- MOBILE FILTER TOGGLE -->
+    <button class="filter-toggle-btn" onclick="toggleFilters()">
+      <i class="fas fa-sliders-h"></i> Filtros
+    </button>
+
+    <!-- ACTIVE FILTER CHIPS -->
+    <div class="active-filters" id="active-filters"></div>
+
+    <div class="shop-layout">
+      <!-- SIDEBAR FILTERS -->
+      <aside class="shop-sidebar" id="shop-sidebar">
+        <div class="sidebar-section">
+          <h4>Categorías</h4>
+          <div id="sidebar-cats"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <h4>Ofertas</h4>
+          <div class="badge-filters">
+            <button class="badge-filter-btn" data-badge="sale" onclick="setBadge('sale')">
+              🔥 En oferta
+            </button>
+            <button class="badge-filter-btn" data-badge="new" onclick="setBadge('new')">
+              ✨ Novedades
+            </button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <h4>Rango de precio</h4>
+          <div class="price-inputs">
+            <input type="number" id="price-min" placeholder="Mínimo" oninput="applyFilters()">
+            <span>–</span>
+            <input type="number" id="price-max" placeholder="Máximo" oninput="applyFilters()">
+          </div>
+        </div>
+
+        <button class="btn btn-outline btn-sm" style="width:100%;margin-top:8px" onclick="clearAllFilters()">
+          <i class="fas fa-times"></i> Limpiar filtros
+        </button>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <div>
+        <!-- TOOLBAR -->
+        <div class="shop-toolbar">
+          <div class="results-count" id="results-count">Cargando...</div>
+          <div class="toolbar-right">
+            <select class="sort-select" id="sort-select" onchange="applyFilters()">
+              <option value="default">Ordenar por...</option>
+              <option value="price-asc">Precio: menor a mayor</option>
+              <option value="price-desc">Precio: mayor a menor</option>
+              <option value="rating">Mejor valorados</option>
+              <option value="name">Nombre A-Z</option>
+            </select>
+            <div class="view-btns">
+              <button class="view-btn active" id="grid-btn" title="Vista grilla" onclick="setView('grid')">
+                <i class="fas fa-th"></i>
+              </button>
+              <button class="view-btn" id="list-btn" title="Vista lista" onclick="setView('list')">
+                <i class="fas fa-list"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PRODUCTS GRID -->
+        <div class="products-grid" id="products-grid">
+          <div class="no-products" style="padding:40px;color:var(--gray);grid-column:1/-1;text-align:center">
+            <i class="fas fa-spinner fa-spin" style="font-size:32px;display:block;margin-bottom:12px"></i>
+            Cargando productos...
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">WAEY</div>
+        <p>Tu tienda de confianza para botellas, mochilas, carteras y valijas. Calidad y estilo para tu vida cotidiana.</p>
+        <div class="footer-social">
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+          <a href="https://wa.me/5491100000000"><i class="fab fa-whatsapp"></i></a>
+          <a href="#"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Productos</h4>
+        <ul>
+          <li><a href="tienda.html?cat=botellas">Botellas y Termos</a></li>
+          <li><a href="tienda.html?cat=mochilas">Mochilas</a></li>
+          <li><a href="tienda.html?cat=carteras">Carteras y Bolsos</a></li>
+          <li><a href="tienda.html?cat=valijas">Valijas y Viaje</a></li>
+          <li><a href="tienda.html?badge=sale">Ofertas</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Información</h4>
+        <ul>
+          <li><a href="#">Sobre WAEY</a></li>
+          <li><a href="#">Envíos y Plazos</a></li>
+          <li><a href="#">Cambios y Devoluciones</a></li>
+          <li><a href="#">Medios de Pago</a></li>
+          <li><a href="#">Preguntas Frecuentes</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="https://wa.me/5491100000000">💬 WhatsApp</a></li>
+          <li><a href="mailto:hola@waey.com.ar">📧 hola@waey.com.ar</a></li>
+          <li><a href="#">📍 Argentina</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 WAEY. Todos los derechos reservados.</span>
+      <span>Hecho con ❤️ en Argentina</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // State
+  let currentCat = '';
+  let currentBadge = '';
+  let currentSearch = '';
+  let currentView = 'grid';
+  let allProducts = [];
+  let allCategories = [];
+
+  // Parse URL params on load
+  document.addEventListener('DOMContentLoaded', async () => {
+    const params = new URLSearchParams(window.location.search);
+    currentCat = params.get('cat') || '';
+    currentBadge = params.get('badge') || '';
+    currentSearch = params.get('q') || '';
+
+    await _ensureCategoriesLoaded();
+    allCategories = await DB.getCategories();
+    allProducts = (await DB.getProducts()).filter(p => p.active);
+
+    // Build dynamic sidebar category buttons
+    buildSidebarCats();
+
+    if (currentBadge) {
+      const el = document.querySelector(`.badge-filter-btn[data-badge="${currentBadge}"]`);
+      if (el) el.classList.add('active');
+    }
+
+    // Update breadcrumb
+    updateBreadcrumb();
+
+    // Render
+    applyFilters();
+  });
+
+  function buildSidebarCats() {
+    const cats = allCategories;
+    const container = document.getElementById('sidebar-cats');
+    const allCount = allProducts.length;
+
+    let html = `
+      <button class="cat-filter-btn ${!currentCat ? 'active' : ''}" data-cat="" onclick="setCategory('')">
+        <i class="fas fa-th-large"></i> Todos los productos
+        <span class="cat-count">${allCount}</span>
+      </button>`;
+
+    cats.forEach(cat => {
+      const count = allProducts.filter(p => p.category === cat.id).length;
+      html += `
+        <button class="cat-filter-btn ${currentCat === cat.id ? 'active' : ''}" data-cat="${cat.id}" onclick="setCategory('${cat.id}')">
+          ${cat.emoji} ${cat.label}
+          <span class="cat-count">${count}</span>
+        </button>`;
+    });
+
+    container.innerHTML = html;
+  }
+
+  function updateBreadcrumb() {
+    const cats = allCategories;
+    const found = cats.find(c => c.id === currentCat);
+    const badgeLabels = { sale: 'Ofertas 🔥', new: 'Novedades ✨' };
+    let label = currentSearch
+      ? `Búsqueda: "${currentSearch}"`
+      : (currentBadge ? badgeLabels[currentBadge] : (found ? found.label : 'Todos los productos'));
+    document.getElementById('breadcrumb-current').textContent = label;
+  }
+
+  function applyFilters() {
+    let filtered = [...allProducts];
+
+    // Category
+    if (currentCat) filtered = filtered.filter(p => p.category === currentCat);
+
+    // Badge
+    if (currentBadge) filtered = filtered.filter(p => p.badge === currentBadge);
+
+    // Search
+    if (currentSearch) {
+      const q = currentSearch.toLowerCase();
+      filtered = filtered.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.description.toLowerCase().includes(q) ||
+        p.category.toLowerCase().includes(q)
+      );
+    }
+
+    // Price range
+    const minVal = parseFloat(document.getElementById('price-min').value);
+    const maxVal = parseFloat(document.getElementById('price-max').value);
+    if (!isNaN(minVal)) filtered = filtered.filter(p => p.price >= minVal);
+    if (!isNaN(maxVal)) filtered = filtered.filter(p => p.price <= maxVal);
+
+    // Sort
+    const sort = document.getElementById('sort-select').value;
+    if (sort === 'price-asc') filtered.sort((a, b) => a.price - b.price);
+    else if (sort === 'price-desc') filtered.sort((a, b) => b.price - a.price);
+    else if (sort === 'rating') filtered.sort((a, b) => b.rating - a.rating);
+    else if (sort === 'name') filtered.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Active filters chips
+    renderChips();
+
+    // Results count
+    const count = filtered.length;
+    document.getElementById('results-count').innerHTML =
+      `<strong>${count}</strong> producto${count !== 1 ? 's' : ''} encontrado${count !== 1 ? 's' : ''}`;
+
+    // Render
+    const grid = document.getElementById('products-grid');
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state" style="grid-column:1/-1">
+          <i class="fas fa-search"></i>
+          <h3>No encontramos productos</h3>
+          <p>Intentá con otros filtros o buscá otro término.</p>
+          <button class="btn btn-primary" style="margin-top:16px" onclick="clearAllFilters()">Ver todos los productos</button>
+        </div>`;
+    } else {
+      grid.innerHTML = filtered.map(renderProductCard).join('');
+    }
+  }
+
+  function renderChips() {
+    const container = document.getElementById('active-filters');
+    let chips = '';
+    if (currentSearch) chips += `<span class="filter-chip" onclick="clearSearch()">🔍 "${currentSearch}" ✕</span>`;
+    if (currentCat) {
+      const labels = { botellas:'Botellas', mochilas:'Mochilas', carteras:'Carteras', valijas:'Valijas' };
+      chips += `<span class="filter-chip" onclick="setCategory('')">${labels[currentCat]} ✕</span>`;
+    }
+    if (currentBadge) {
+      chips += `<span class="filter-chip" onclick="setBadge('')">${currentBadge === 'sale' ? '🔥 Ofertas' : '✨ Novedades'} ✕</span>`;
+    }
+    container.innerHTML = chips;
+  }
+
+  function setCategory(cat) {
+    currentCat = cat;
+    buildSidebarCats(); // rebuilds with correct active state
+    updateBreadcrumb();
+    applyFilters();
+    updateURL();
+  }
+
+  function setBadge(badge) {
+    currentBadge = currentBadge === badge ? '' : badge;
+    document.querySelectorAll('.badge-filter-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.badge === currentBadge);
+    });
+    updateBreadcrumb();
+    applyFilters();
+    updateURL();
+  }
+
+  function clearSearch() {
+    currentSearch = '';
+    document.getElementById('search-input').value = '';
+    updateBreadcrumb();
+    applyFilters();
+    updateURL();
+  }
+
+  function clearAllFilters() {
+    currentCat = '';
+    currentBadge = '';
+    currentSearch = '';
+    document.getElementById('price-min').value = '';
+    document.getElementById('price-max').value = '';
+    document.getElementById('sort-select').value = 'default';
+    document.getElementById('search-input').value = '';
+    buildSidebarCats(); // resets active state to "Todos"
+    document.querySelectorAll('.badge-filter-btn').forEach(b => b.classList.remove('active'));
+    updateBreadcrumb();
+    applyFilters();
+    updateURL();
+  }
+
+  function updateURL() {
+    const params = new URLSearchParams();
+    if (currentCat) params.set('cat', currentCat);
+    if (currentBadge) params.set('badge', currentBadge);
+    if (currentSearch) params.set('q', currentSearch);
+    const newURL = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+    history.replaceState(null, '', newURL);
+  }
+
+  function setView(view) {
+    currentView = view;
+    const grid = document.getElementById('products-grid');
+    grid.classList.toggle('list-view', view === 'list');
+    document.getElementById('grid-btn').classList.toggle('active', view === 'grid');
+    document.getElementById('list-btn').classList.toggle('active', view === 'list');
+  }
+
+  function toggleFilters() {
+    const sidebar = document.getElementById('shop-sidebar');
+    sidebar.classList.toggle('open');
+  }
+
+  function doSearch() {
+    const q = document.getElementById('search-input').value.trim();
+    currentSearch = q;
+    updateBreadcrumb();
+    applyFilters();
+    updateURL();
+  }
+
+  document.getElementById('search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
+
+  // Pre-fill search input if ?q= param
+  const _params = new URLSearchParams(window.location.search);
+  if (_params.get('q')) document.getElementById('search-input').value = _params.get('q');
+</script>
+</body>
+</html>
