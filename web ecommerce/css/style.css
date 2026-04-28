@@ -47,7 +47,7 @@ ul { list-style: none; }
 /* ===== HEADER ===== */
 header {
   background: var(--white);
-  border-bottom: 2px solid var(--border);
+  border-bottom: 3px solid var(--accent);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -1168,7 +1168,7 @@ footer {
 
 /* ===== SECTION PADDING ===== */
 .section { padding: 56px 0; }
-.section-gray { background: var(--light-gray); }
+.section-gray { background: var(--bg-pastel); }
 
 /* ===== NO RESULTS ===== */
 .no-products {
