@@ -1169,6 +1169,13 @@ footer {
 /* ===== SECTION PADDING ===== */
 .section { padding: 56px 0; }
 .section-gray { background: var(--bg-pastel); }
+.section-white { background: var(--white); }
+
+/* Hover en NARANJA VIVO solo para productos en oferta */
+.product-card:has(.product-badge.sale):hover {
+  border-color: var(--orange);
+  box-shadow: 0 6px 24px rgba(229,70,0,0.28);
+}
 
 /* ===== NO RESULTS ===== */
 .no-products {
@@ -1181,7 +1188,7 @@ footer {
 
 /* ===== PROMO BANNER ===== */
 .promo-banner {
-  background: linear-gradient(135deg, var(--orange) 0%, var(--orange-dark) 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
   border-radius: var(--radius);
   padding: 40px;
   display: flex;
