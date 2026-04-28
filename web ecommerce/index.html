@@ -74,7 +74,9 @@
       </div>
     </div>
     <div class="hero-img">
-      <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80" alt="Mochila WAEY">
+      <div class="hero-slider" id="hero-slider">
+        <!-- Se rellena dinámicamente con productos en oferta -->
+      </div>
     </div>
   </div>
 </section>
@@ -260,6 +262,9 @@
     await _ensureCategoriesLoaded();
     const products = (await DB.getProducts()).filter(p => p.active);
 
+    // Hero slider: productos en oferta
+    buildHeroSlider(products.filter(p => p.badge === 'sale').slice(0, 6));
+
     // Destacados (primeros 4)
     const featured = products.slice(0, 4);
     document.getElementById('featured-products').innerHTML = featured.length
@@ -273,6 +278,39 @@
       : products.slice(4, 8).map(renderProductCard).join('');
   });
 
+  // ===== Construye el hero slider con productos en oferta =====
+  function buildHeroSlider(saleProducts) {
+    const slider = document.getElementById('hero-slider');
+    if (!slider) return;
+
+    // Si no hay productos en oferta, mostrar imagen por defecto
+    if (!saleProducts || saleProducts.length === 0) {
+      slider.innerHTML = `<img class="active" src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80" alt="WAEY">`;
+      return;
+    }
+
+    const slides = saleProducts.map((p, i) => {
+      const img = (p.images && p.images[0]) || 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80';
+      const oldPriceHTML = p.oldPrice ? `<s>${formatPrice(p.oldPrice)}</s>` : '';
+      return `
+        <a class="hero-slide${i === 0 ? ' active' : ''}" href="producto.html?id=${p.id}">
+          <img src="${img}" alt="${p.name}">
+          <div class="hero-slide-info">
+            <span class="hero-slide-tag">🔥 OFERTA</span>
+            <span class="hero-slide-name">${p.name}</span>
+            <span class="hero-slide-price">${formatPrice(p.price)} ${oldPriceHTML}</span>
+          </div>
+        </a>`;
+    }).join('');
+
+    const dots = `<div class="hero-dots">${
+      saleProducts.map((_, i) => `<span class="${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`).join('')
+    }</div>`;
+
+    slider.innerHTML = slides + dots;
+    initHeroSlider();
+  }
+
   function doSearch() {
     const q = document.getElementById('search-input').value.trim();
     if (q) window.location.href = `tienda.html?q=${encodeURIComponent(q)}`;
@@ -280,6 +318,35 @@
   document.getElementById('search-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') doSearch();
   });
+
+  // ===== Carrusel del hero (autoplay + dots) =====
+  function initHeroSlider() {
+    const slider = document.querySelector('.hero-slider');
+    if (!slider) return;
+    const slides = slider.querySelectorAll('.hero-slide');
+    const dots = slider.querySelectorAll('.hero-dots span');
+    if (slides.length <= 1) return; // No hay carrusel si hay 1 sola imagen
+    let idx = 0;
+    let timer = null;
+    function show(i) {
+      slides[idx].classList.remove('active');
+      if (dots[idx]) dots[idx].classList.remove('active');
+      idx = (i + slides.length) % slides.length;
+      slides[idx].classList.add('active');
+      if (dots[idx]) dots[idx].classList.add('active');
+    }
+    function next() { show(idx + 1); }
+    function start() { timer = setInterval(next, 4000); }
+    function stop()  { clearInterval(timer); }
+    dots.forEach(d => d.addEventListener('click', e => {
+      e.preventDefault();
+      e.stopPropagation();
+      stop();
+      show(parseInt(d.dataset.idx, 10));
+      start();
+    }));
+    start();
+  }
 </script>
 </body>
 </html>
