@@ -613,6 +613,12 @@ nav.main-nav {
   gap: 6px;
 }
 .product-card .btn-add:hover { background: var(--orange); }
+.product-card .btn-add-text-full { display: inline; }
+.product-card .btn-add-text-short { display: none; }
+@media (max-width: 480px) {
+  .product-card .btn-add-text-full { display: none; }
+  .product-card .btn-add-text-short { display: inline; }
+}
 
 /* ===== FILTERS ===== */
 .filters-bar {
@@ -1301,6 +1307,21 @@ footer {
   .product-info { padding: 10px; }
   .product-name { font-size: 13px; }
   .product-price { font-size: 16px; }
+  /* Botón "Agregar al carrito" más compacto en mobile */
+  .product-card .btn-add {
+    padding: 8px 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+/* En cualquier dispositivo táctil ocultamos los iconitos flotantes
+   (👁️ 🛒) que en desktop sólo aparecen al pasar el mouse */
+@media (hover: none) {
+  .product-actions { display: none !important; }
+  /* Y siempre dejamos visible el botón principal del card */
+  .product-card .btn-add { opacity: 1; }
 }
 
 /* ===== SCROLLBAR ===== */
@@ -1321,3 +1342,38 @@ footer {
 .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .flex-between { display: flex; align-items: center; justify-content: space-between; }
+ 16px; }
+  .product-card .btn-add {
+    padding: 8px 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+/* En cualquier dispositivo táctil ocultamos los iconitos flotantes
+   (👁️ 🛒) que en desktop sólo aparecen al pasar el mouse */
+@media (hover: none) {
+  .product-actions { display: none !important; }
+  .product-card .btn-add { opacity: 1; }
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--light-gray); }
+::-webkit-scrollbar-thumb { background: var(--orange); border-radius: 3px; }
+
+/* ===== HELPERS ===== */
+.hidden { display: none !important; }
+.text-center { text-align: center; }
+.mt-8 { margin-top: 8px; }
+.mt-16 { margin-top: 16px; }
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }
+ }
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+.mb-8 { margin-bottom: 8px; }
+.mb-16 { margin-bottom: 16px; }

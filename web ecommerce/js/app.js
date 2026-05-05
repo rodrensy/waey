@@ -663,7 +663,8 @@ function renderProductCard(product) {
         </div>
         <div class="product-stars mt-8">${starsHTML(product.rating, true, product.reviews)}</div>
         <button class="btn-add mt-8" onclick="event.stopPropagation(); Cart.add('${product.id}')">
-          🛒 Agregar al carrito
+          <span class="btn-add-text-full">🛒 Agregar al carrito</span>
+          <span class="btn-add-text-short">🛒 Agregar</span>
         </button>
       </div>
     </div>
@@ -678,6 +679,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Marcar nav activo
   const path = window.location.pathname.split('/').pop();
   document.querySelectorAll('.nav-inner a').forEach(a => {
+    if (a.getAttribute('href') === path) a.classList.add('active');
+  });
+});
+nner a').forEach(a => {
     if (a.getAttribute('href') === path) a.classList.add('active');
   });
 });
