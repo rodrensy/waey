@@ -682,7 +682,3 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (a.getAttribute('href') === path) a.classList.add('active');
   });
 });
-nner a').forEach(a => {
-    if (a.getAttribute('href') === path) a.classList.add('active');
-  });
-});
