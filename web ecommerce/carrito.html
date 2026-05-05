@@ -243,117 +243,6 @@
       transition: all 0.2s;
     }
     .btn-keep-shopping:hover { background: var(--orange); color: #fff; }
-    /* Mercado Pago button */
-    .btn-mp-cart {
-      width: 100%;
-      padding: 16px 20px;
-      background: linear-gradient(135deg, #00b1ea 0%, #009ee3 100%);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
-      font-family: inherit;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 10px;
-      text-decoration: none;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-mp-cart:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 20px rgba(0,177,234,0.35);
-    }
-    .pay-divider {
-      text-align: center;
-      font-size: 12px;
-      color: var(--gray);
-      margin: 14px 0 4px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 600;
-    }
-    /* Modal de confirmación de pago */
-    .pay-modal-overlay {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.55);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      padding: 20px;
-    }
-    .pay-modal-overlay.active { display: flex; }
-    .pay-modal {
-      background: #fff;
-      border-radius: var(--radius);
-      max-width: 460px;
-      width: 100%;
-      padding: 28px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-    }
-    .pay-modal h3 {
-      font-size: 20px;
-      margin-bottom: 6px;
-      color: #009ee3;
-    }
-    .pay-modal p { font-size: 14px; color: var(--gray); margin-bottom: 14px; line-height: 1.5; }
-    .pay-modal .pay-amount {
-      background: var(--bg-pastel);
-      padding: 16px;
-      border-radius: var(--radius);
-      text-align: center;
-      margin: 14px 0;
-    }
-    .pay-modal .pay-amount .label { font-size: 12px; color: var(--gray); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-    .pay-modal .pay-amount .value { font-size: 28px; font-weight: 900; color: #009ee3; margin-top: 4px; }
-    .pay-modal ol { font-size: 13px; color: var(--dark); padding-left: 20px; margin: 14px 0; }
-    .pay-modal ol li { margin-bottom: 6px; }
-    .pay-modal-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .pay-modal-actions button, .pay-modal-actions a {
-      flex: 1;
-      padding: 12px;
-      border-radius: var(--radius);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      text-decoration: none;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .pay-modal-cancel { background: var(--light-gray); color: var(--dark); }
-    .pay-modal-confirm { background: #009ee3; color: #fff; }
-    .pay-modal-confirm:hover { background: #007eb5; }
-    /* Payment methods icons */
-    .payment-icons {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--border);
-    }
-    .payment-icon {
-      padding: 4px 10px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--gray);
-      background: var(--light);
-    }
     /* Empty cart */
     .cart-empty {
       text-align: center;
@@ -380,13 +269,49 @@
     .breadcrumb a:hover { color: var(--orange); }
     .breadcrumb span { color: var(--orange); font-weight: 600; }
     @media (max-width: 900px) {
-      .cart-layout { grid-template-columns: 1fr; }
+      .cart-layout { grid-template-columns: 1fr; gap: 18px; }
       .cart-summary { position: static; }
     }
     @media (max-width: 600px) {
-      .cart-item { flex-wrap: wrap; gap: 12px; }
-      .cart-item-img { width: 72px; height: 72px; }
-      .cart-item-right { flex-direction: row; align-items: center; }
+      /* Item del carrito: layout 2 filas: foto+info arriba, controles abajo */
+      .cart-item {
+        flex-wrap: wrap;
+        gap: 12px;
+        padding: 14px 14px;
+        align-items: flex-start;
+      }
+      .cart-item-img { width: 64px; height: 64px; border-radius: 8px; }
+      .cart-item-info {
+        flex: 1 1 calc(100% - 80px);
+        min-width: 0;
+      }
+      .cart-item-name { font-size: 13px; white-space: normal; }
+      .cart-item-cat { font-size: 10px; }
+      .cart-item-price { font-size: 15px; }
+      .cart-item-unit-price { font-size: 11px; }
+      /* Controles van abajo en una fila */
+      .cart-item-right {
+        flex: 1 1 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-top: 4px;
+      }
+      .qty-ctrl button { width: 28px; height: 28px; font-size: 14px; }
+      .qty-ctrl input { width: 36px; height: 28px; font-size: 13px; }
+      .btn-remove-item { font-size: 12px; padding: 6px 8px; }
+      /* Header del carrito */
+      .cart-items-header { padding: 12px 14px; }
+      .cart-items-header h2 { font-size: 14px; }
+      /* Resumen más compacto */
+      .cart-summary-header { padding: 12px 16px; }
+      .cart-summary-header h3 { font-size: 14px; }
+      .cart-summary-body { padding: 16px; }
+      .summary-row { font-size: 13px; }
+      .summary-row.total .amount { font-size: 19px; }
+      .btn-whatsapp-cart, .btn-keep-shopping { font-size: 14px; padding: 13px 16px; }
+      .breadcrumb { margin-bottom: 16px; font-size: 12px; }
     }
   </style>
 </head>
@@ -456,33 +381,6 @@
   </div>
 </div>
 
-<!-- MODAL DE PAGO MERCADO PAGO -->
-<div id="pay-modal" class="pay-modal-overlay" onclick="if(event.target===this) closeMpPay()">
-  <div class="pay-modal">
-    <h3>💳 Pagar con Mercado Pago</h3>
-    <p>Vas a ser redirigido a Mercado Pago para pagar con tu tarjeta (Visa, Master, Naranja, Amex), dinero en cuenta o efectivo en Pago Fácil/Rapipago.</p>
-
-    <div class="pay-amount">
-      <div class="label">Monto a pagar</div>
-      <div class="value" id="pay-modal-amount">$0</div>
-    </div>
-
-    <ol>
-      <li>Hacé clic en <strong>"Continuar a Mercado Pago"</strong>.</li>
-      <li>Si el monto no aparece prellenado, escribilo: <strong id="pay-modal-amount-text">$0</strong>.</li>
-      <li>Completá el pago con el medio que prefieras.</li>
-      <li>Mandanos el comprobante por WhatsApp así te confirmamos el envío.</li>
-    </ol>
-
-    <div class="pay-modal-actions">
-      <button type="button" class="pay-modal-cancel" onclick="closeMpPay()">Cancelar</button>
-      <a id="pay-modal-confirm" class="pay-modal-confirm" target="_blank" rel="noopener" onclick="confirmMpPay()">
-        Continuar a Mercado Pago →
-      </a>
-    </div>
-  </div>
-</div>
-
 <!-- FOOTER -->
 <footer>
   <div class="container">
@@ -539,17 +437,7 @@
 <script>
   const FREE_SHIPPING_THRESHOLD = 50000;
 
-  // ============================================================
-  // MERCADO PAGO — Link de cobro
-  // ⚠️  Reemplazá este placeholder con tu link real:
-  //     1. Entrá a https://www.mercadopago.com.ar/
-  //     2. Tu negocio → Cobrar → Link de pago
-  //     3. Creá un nuevo link (puede ser monto abierto o fijo)
-  //     4. Pegá acá el link que te genere (ej: 'https://mpago.la/AbCd123')
-  // ============================================================
-  const MP_PAY_LINK = 'https://mpago.la/REEMPLAZAR-CON-TU-LINK';
-
-  // WhatsApp para el comprobante (reemplazá si querés otro número)
+  // WhatsApp para coordinar el pedido
   const WHATSAPP_NUMBER = '5491100000000';
 
   document.addEventListener('DOMContentLoaded', async () => {
@@ -662,13 +550,6 @@
                 <span class="amount">${formatPrice(subtotal)}</span>
               </div>
 
-              <!-- Pagar con Mercado Pago (online, tarjeta) -->
-              <button type="button" class="btn-mp-cart" onclick="openMpPay(${subtotal})">
-                💳 Pagar con Mercado Pago
-              </button>
-
-              <div class="pay-divider">— o —</div>
-
               <!-- WhatsApp CTA -->
               <a href="${waLink}" target="_blank" class="btn-whatsapp-cart" onclick="Cart.saveOrderFromCart();">
                 <i class="fab fa-whatsapp" style="font-size:20px"></i>
@@ -678,15 +559,8 @@
                 <i class="fas fa-store"></i> Seguir comprando
               </a>
 
-              <!-- Payment methods -->
-              <div class="payment-icons">
-                <span class="payment-icon">💳 Visa / Master</span>
-                <span class="payment-icon">💳 Naranja / Amex</span>
-                <span class="payment-icon">🏦 Transferencia</span>
-                <span class="payment-icon">💵 Pago Fácil / Rapipago</span>
-              </div>
-              <div style="text-align:center;font-size:11px;color:var(--gray);margin-top:10px">
-                <i class="fas fa-shield-alt"></i> Compra 100% segura
+              <div style="text-align:center;font-size:11px;color:var(--gray);margin-top:14px">
+                <i class="fas fa-shield-alt"></i> Coordinamos pago y envío por WhatsApp
               </div>
             </div>
           </div>
@@ -737,45 +611,6 @@
     if (e.key === 'Enter') doSearch();
   });
 
-  // ============== MERCADO PAGO — Modal de pago ==============
-  let _pendingPayAmount = 0;
-
-  function openMpPay(amount) {
-    if (!MP_PAY_LINK || MP_PAY_LINK.includes('REEMPLAZAR')) {
-      alert('⚠️ El link de Mercado Pago todavía no está configurado.\n\nGenerá tu link en mercadopago.com.ar → Tu negocio → Cobrar → Link de pago, y pegalo en MP_PAY_LINK dentro de carrito.html.');
-      return;
-    }
-    _pendingPayAmount = amount;
-    const formatted = formatPrice(amount);
-    document.getElementById('pay-modal-amount').textContent = formatted;
-    const amountText = document.getElementById('pay-modal-amount-text');
-    if (amountText) amountText.textContent = formatted;
-    document.getElementById('pay-modal-confirm').href = MP_PAY_LINK;
-    document.getElementById('pay-modal').classList.add('active');
-  }
-
-  function closeMpPay() {
-    document.getElementById('pay-modal').classList.remove('active');
-  }
-
-  async function confirmMpPay() {
-    // Guardar el pedido como pendiente de pago
-    try {
-      await Cart.saveOrderFromCart('mercado_pago');
-    } catch (e) {
-      console.warn('No se pudo guardar el pedido:', e);
-    }
-    // Cerrar modal después de un breve momento; el link ya abre Mercado Pago en otra pestaña
-    setTimeout(() => {
-      closeMpPay();
-      showToast('✅ Te redirigimos a Mercado Pago. Después mandanos el comprobante por WhatsApp 💬', 'success');
-    }, 200);
-  }
-
-  // Cerrar modal con Escape
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeMpPay();
-  });
 </script>
 </body>
 </html>
