@@ -9,14 +9,18 @@ create table if not exists public.categories (
   label text not null,
   emoji text default '📦',
   position int default 0,
+  parent_id text references public.categories(id) on delete cascade,
   created_at timestamptz default now()
 );
+
+create index if not exists idx_categories_parent on public.categories(parent_id);
 
 -- ===== 2. TABLA PRODUCTS =====
 create table if not exists public.products (
   id text primary key,
   name text not null,
   category text references public.categories(id) on delete set null,
+  subcategory text references public.categories(id) on delete set null,
   price numeric(12,2) not null default 0,
   old_price numeric(12,2),
   images jsonb default '[]'::jsonb,
@@ -31,8 +35,9 @@ create table if not exists public.products (
   updated_at timestamptz default now()
 );
 
-create index if not exists idx_products_category on public.products(category);
-create index if not exists idx_products_active   on public.products(active);
+create index if not exists idx_products_category    on public.products(category);
+create index if not exists idx_products_subcategory on public.products(subcategory);
+create index if not exists idx_products_active      on public.products(active);
 
 -- ===== 3. TABLA REVIEWS =====
 create table if not exists public.reviews (
@@ -80,11 +85,55 @@ create table if not exists public.profiles (
 );
 
 -- ===== 7. SEMILLA: CATEGORÍAS POR DEFECTO =====
-insert into public.categories (id, label, emoji, position) values
-  ('botellas', 'Botellas y Termos', '🧴', 1),
-  ('mochilas', 'Mochilas',          '🎒', 2),
-  ('carteras', 'Carteras y Bolsos', '👜', 3),
-  ('valijas',  'Valijas y Viaje',   '🧳', 4)
+-- Top-level
+insert into public.categories (id, label, emoji, position, parent_id) values
+  ('mochilas',   'Mochilas',                '🎒', 1, null),
+  ('carteras',   'Carteras y Bolsos',       '👜', 2, null),
+  ('rinoneras',  'Riñoneras y Bandoleras',  '🎽', 3, null),
+  ('loncheras',  'Loncheras y Térmicos',    '🍱', 4, null),
+  ('accesorios', 'Accesorios',              '💼', 5, null),
+  ('viaje',      'Viaje',                   '✈️', 6, null),
+  ('hombre',     'Hombre',                  '🧍‍♂️', 7, null),
+  ('mujer',      'Mujer',                   '🧍‍♀️', 8, null),
+  ('ofertas',    'Ofertas',                 '🔥', 9, null)
+on conflict (id) do nothing;
+
+-- Subcategorías
+insert into public.categories (id, label, emoji, position, parent_id) values
+  ('mochilas-urbanas',     'Urbanas',              '🎒', 1, 'mochilas'),
+  ('mochilas-deportivas',  'Deportivas',           '🎒', 2, 'mochilas'),
+  ('mochilas-escolares',   'Escolares',            '🎒', 3, 'mochilas'),
+  ('mochilas-ejecutivas',  'Ejecutivas (notebook)', '🎒', 4, 'mochilas'),
+  ('mochilas-viaje',       'Viaje',                '🎒', 5, 'mochilas'),
+  ('carteras-carteras',    'Carteras',             '👜', 1, 'carteras'),
+  ('carteras-mano',        'Bolsos de mano',       '👜', 2, 'carteras'),
+  ('carteras-viaje',       'Bolsos de viaje',      '👜', 3, 'carteras'),
+  ('carteras-tote',        'Tote bags',            '👜', 4, 'carteras'),
+  ('rinoneras-rinoneras',  'Riñoneras',            '🎽', 1, 'rinoneras'),
+  ('rinoneras-bandoleras', 'Bandoleras',           '🎽', 2, 'rinoneras'),
+  ('rinoneras-crossbody',  'Crossbody',            '🎽', 3, 'rinoneras'),
+  ('loncheras-loncheras',  'Loncheras',            '🍱', 1, 'loncheras'),
+  ('loncheras-termicos',   'Bolsos térmicos',      '🍱', 2, 'loncheras'),
+  ('loncheras-botellas',   'Botellas deportivas',  '🍱', 3, 'loncheras'),
+  ('loncheras-termos',     'Termos',               '🍱', 4, 'loncheras'),
+  ('accesorios-billeteras','Billeteras',           '💼', 1, 'accesorios'),
+  ('accesorios-tarjeteros','Tarjeteros',           '💼', 2, 'accesorios'),
+  ('accesorios-necesers',  'Necesers',             '💼', 3, 'accesorios'),
+  ('accesorios-cosmeticos','Porta cosméticos',     '💼', 4, 'accesorios'),
+  ('accesorios-organizadores','Organizadores',     '💼', 5, 'accesorios'),
+  ('viaje-valijas',        'Valijas',              '✈️', 1, 'viaje'),
+  ('viaje-organizadores',  'Organizadores de viaje','✈️',2, 'viaje'),
+  ('viaje-almohadas',      'Almohadas de viaje',   '✈️', 3, 'viaje'),
+  ('viaje-cabina',         'Mochilas de cabina',   '✈️', 4, 'viaje'),
+  ('hombre-mochilas',      'Mochilas hombre',      '🧍‍♂️', 1, 'hombre'),
+  ('hombre-rinoneras',     'Riñoneras hombre',     '🧍‍♂️', 2, 'hombre'),
+  ('hombre-billeteras',    'Billeteras hombre',    '🧍‍♂️', 3, 'hombre'),
+  ('mujer-carteras',       'Carteras',             '🧍‍♀️', 1, 'mujer'),
+  ('mujer-mochilas',       'Mochilas mujer',       '🧍‍♀️', 2, 'mujer'),
+  ('mujer-accesorios',     'Accesorios mujer',     '🧍‍♀️', 3, 'mujer'),
+  ('ofertas-descuentos',   'Descuentos',           '🔥', 1, 'ofertas'),
+  ('ofertas-ultimas',      'Últimas unidades',     '🔥', 2, 'ofertas'),
+  ('ofertas-promos',       'Promociones',          '🔥', 3, 'ofertas')
 on conflict (id) do nothing;
 
 -- ===== 8. SEMILLA: CONFIG POR DEFECTO =====

@@ -1,18 +1,24 @@
 /* ===== WAEY ECOMMERCE - ESTILOS PRINCIPALES ===== */
 :root {
+  /* Paleta original: naranja vivo + celeste suave + fondo beige.
+     SOLO topbar y nav quedan con tonos claros (celeste/blanco). */
   --orange: #e54600;
   --orange-dark: #b83700;
   --orange-light: #ff6628;
+  --orange-bg: #FFF1E6;        /* pastel naranja para hover de nav */
   --accent: #5294b5;
   --accent-dark: #3e7a98;
   --accent-light: #7fb1cc;
-  --bg-pastel: #d0c8ba;
+  --accent-bg: #EAF4FA;        /* pastel celeste */
+  --bg-pastel: #d0c8ba;        /* beige original */
   --black: #1A1A1A;
   --dark: #2C2C2C;
   --gray: #6B6B6B;
+  --light: #F4F4F4;
   --light-gray: #F4F4F4;
   --border: #E0E0E0;
   --white: #FFFFFF;
+  --font: 'Montserrat','Segoe UI',sans-serif;
   --shadow: 0 2px 12px rgba(0,0,0,0.08);
   --shadow-hover: 0 6px 24px rgba(82,148,181,0.28);
   --radius: 10px;
@@ -34,7 +40,7 @@ ul { list-style: none; }
 
 /* ===== TOPBAR ===== */
 .topbar {
-  background: var(--black);
+  background: var(--accent);
   color: #fff;
   text-align: center;
   padding: 8px 16px;
@@ -42,7 +48,7 @@ ul { list-style: none; }
   font-weight: 500;
   letter-spacing: 0.3px;
 }
-.topbar a { color: var(--orange-light); }
+.topbar a { color: #fff; text-decoration: underline; }
 
 /* ===== HEADER ===== */
 header {
@@ -138,7 +144,8 @@ header {
 
 /* ===== NAV ===== */
 nav.main-nav {
-  background: var(--black);
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
 }
 .nav-inner {
   max-width: 1280px;
@@ -147,20 +154,25 @@ nav.main-nav {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-wrap: wrap;
 }
 .nav-inner a {
-  color: #ccc;
+  color: var(--accent-dark);
   padding: 14px 16px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 400;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: var(--transition);
   display: block;
 }
+.nav-inner a.active,
+.nav-inner a:hover {
+  font-weight: 600;   /* el activo/hover queda un poco más grueso para destacar */
+}
 .nav-inner a:hover, .nav-inner a.active {
   color: var(--orange);
-  background: rgba(229,70,0,0.08);
+  background: var(--orange-bg);
 }
 
 /* ===== CONTAINER ===== */
@@ -170,11 +182,36 @@ nav.main-nav {
   padding: 0 24px;
 }
 
-/* ===== HERO SLIDER ===== */
+/* ===== HERO SLIDER (estilo claro celeste/crema, inspirado en la referencia) ===== */
 .hero {
-  background: linear-gradient(135deg, var(--black) 0%, #3a1a0a 100%);
+  background: linear-gradient(135deg, #EAF4FA 0%, #FFF8F1 60%, #FFEFE0 100%);
   padding: 60px 0;
   overflow: hidden;
+  position: relative;
+}
+/* Círculo decorativo celeste a la derecha */
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -160px; right: -160px;
+  width: 460px; height: 460px;
+  background: #B8DCEC;
+  border-radius: 50%;
+  opacity: 0.55;
+  z-index: 0;
+  pointer-events: none;
+}
+/* Mancha naranja pastel abajo a la izquierda */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -120px; left: -120px;
+  width: 320px; height: 320px;
+  background: #FFD9B8;
+  border-radius: 50%;
+  opacity: 0.55;
+  z-index: 0;
+  pointer-events: none;
 }
 .hero-inner {
   max-width: 1280px;
@@ -184,17 +221,19 @@ nav.main-nav {
   grid-template-columns: 1fr 1fr;
   align-items: center;
   gap: 40px;
+  position: relative;
+  z-index: 1;
 }
 .hero-text h1 {
   font-size: clamp(32px, 5vw, 58px);
   font-weight: 900;
-  color: #fff;
+  color: var(--black);
   line-height: 1.1;
   margin-bottom: 16px;
 }
 .hero-text h1 span { color: var(--orange); }
 .hero-text p {
-  color: #ccc;
+  color: var(--gray);
   font-size: 16px;
   margin-bottom: 28px;
   max-width: 440px;
@@ -203,11 +242,13 @@ nav.main-nav {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 .hero-img img {
   max-height: 380px;
   object-fit: contain;
-  filter: drop-shadow(0 20px 40px rgba(229,70,0,0.3));
+  filter: drop-shadow(0 20px 40px rgba(82,148,181,0.25));
 }
 
 /* ===== Hero Slider ===== */
@@ -254,20 +295,21 @@ nav.main-nav {
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(6px);
   padding: 10px 18px;
   border-radius: 10px;
-  color: #fff;
+  color: var(--black);
   text-align: center;
   max-width: 90%;
   pointer-events: none;
+  box-shadow: 0 4px 16px rgba(82,148,181,0.18);
 }
 .hero-slide-tag {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.5px;
-  color: var(--orange-light);
+  color: var(--orange);
 }
 .hero-slide-name {
   font-size: 14px;
@@ -282,12 +324,12 @@ nav.main-nav {
 .hero-slide-price {
   font-size: 16px;
   font-weight: 800;
-  color: #fff;
+  color: var(--orange);
 }
 .hero-slide-price s {
   font-size: 12px;
   font-weight: 500;
-  color: #bbb;
+  color: var(--gray);
   margin-left: 4px;
 }
 .hero-dots {
@@ -303,12 +345,12 @@ nav.main-nav {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
+  background: rgba(82, 148, 181, 0.35);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 .hero-dots span:hover {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(82, 148, 181, 0.65);
 }
 .hero-dots span.active {
   background: var(--orange);
@@ -1082,8 +1124,8 @@ nav.main-nav {
 
 /* ===== FOOTER ===== */
 footer {
-  background: var(--black);
-  color: #ccc;
+  background: #F1F4F7;            /* gris pastel claro */
+  color: var(--black);            /* texto general en negro */
   padding-top: 60px;
 }
 .footer-grid {
@@ -1091,35 +1133,40 @@ footer {
   grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 40px;
   padding-bottom: 40px;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #DCE3EA;
 }
-.footer-brand .logo { margin-bottom: 14px; }
-.footer-brand p { font-size: 13px; line-height: 1.8; max-width: 280px; }
-.footer-col h4 { color: #fff; font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+/* Logo "WAEY" en celeste */
+.footer-brand .logo { margin-bottom: 14px; color: var(--accent); }
+.footer-brand .logo span { color: var(--black); }
+.footer-brand p { font-size: 13px; line-height: 1.8; max-width: 280px; color: var(--black); }
+/* Títulos PRODUCTOS / INFORMACIÓN / CONTACTO en celeste */
+.footer-col h4 { color: var(--accent); font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
 .footer-col li { margin-bottom: 8px; }
-.footer-col li a { font-size: 13px; color: #aaa; transition: var(--transition); }
+/* Links en negro, hover naranja */
+.footer-col li a { font-size: 13px; color: var(--black); transition: var(--transition); }
 .footer-col li a:hover { color: var(--orange); }
 .footer-social { display: flex; gap: 12px; margin-top: 16px; }
 .footer-social a {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #333;
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ccc;
+  color: var(--accent);
   font-size: 16px;
   transition: var(--transition);
+  border: 1px solid #DCE3EA;
 }
-.footer-social a:hover { background: var(--orange); color: #fff; }
+.footer-social a:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
 .footer-bottom {
   padding: 20px 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 12px;
-  color: #666;
+  color: var(--gray);
 }
 
 /* ===== TOAST ===== */

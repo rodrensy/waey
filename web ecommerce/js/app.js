@@ -159,6 +159,7 @@ function rowToProduct(r) {
     id: r.id,
     name: r.name,
     category: r.category,
+    subcategory: r.subcategory || null,
     price: Number(r.price),
     oldPrice: r.old_price != null ? Number(r.old_price) : null,
     images: r.images || [],
@@ -176,6 +177,7 @@ function productToRow(p) {
     id: p.id,
     name: p.name,
     category: p.category,
+    subcategory: p.subcategory || null,
     price: p.price,
     old_price: p.oldPrice ?? null,
     images: p.images || [],
@@ -294,12 +296,61 @@ const DB = {
     _cache.config = null;
   },
 
-  // ----- CATEGORÍAS -----
+  // ----- CATEGORÍAS (con subcategorías vía parent_id) -----
   DEFAULT_CATEGORIES: [
-    { id: 'botellas', label: 'Botellas y Termos', emoji: '🧴' },
-    { id: 'mochilas', label: 'Mochilas',           emoji: '🎒' },
-    { id: 'carteras', label: 'Carteras y Bolsos',  emoji: '👜' },
-    { id: 'valijas',  label: 'Valijas y Viaje',    emoji: '🧳' }
+    // Top-level
+    { id: 'mochilas',   label: 'Mochilas',                emoji: '🎒', parentId: null },
+    { id: 'carteras',   label: 'Carteras y Bolsos',       emoji: '👜', parentId: null },
+    { id: 'rinoneras',  label: 'Riñoneras y Bandoleras',  emoji: '🎽', parentId: null },
+    { id: 'loncheras',  label: 'Loncheras y Térmicos',    emoji: '🍱', parentId: null },
+    { id: 'accesorios', label: 'Accesorios',              emoji: '💼', parentId: null },
+    { id: 'viaje',      label: 'Viaje',                   emoji: '✈️', parentId: null },
+    { id: 'hombre',     label: 'Hombre',                  emoji: '🧍‍♂️', parentId: null },
+    { id: 'mujer',      label: 'Mujer',                   emoji: '🧍‍♀️', parentId: null },
+    { id: 'ofertas',    label: 'Ofertas',                 emoji: '🔥', parentId: null },
+    // Subcats Mochilas
+    { id: 'mochilas-urbanas',    label: 'Urbanas',               emoji: '🎒', parentId: 'mochilas' },
+    { id: 'mochilas-deportivas', label: 'Deportivas',            emoji: '🎒', parentId: 'mochilas' },
+    { id: 'mochilas-escolares',  label: 'Escolares',             emoji: '🎒', parentId: 'mochilas' },
+    { id: 'mochilas-ejecutivas', label: 'Ejecutivas (notebook)', emoji: '🎒', parentId: 'mochilas' },
+    { id: 'mochilas-viaje',      label: 'Viaje',                 emoji: '🎒', parentId: 'mochilas' },
+    // Subcats Carteras
+    { id: 'carteras-carteras', label: 'Carteras',         emoji: '👜', parentId: 'carteras' },
+    { id: 'carteras-mano',     label: 'Bolsos de mano',   emoji: '👜', parentId: 'carteras' },
+    { id: 'carteras-viaje',    label: 'Bolsos de viaje',  emoji: '👜', parentId: 'carteras' },
+    { id: 'carteras-tote',     label: 'Tote bags',        emoji: '👜', parentId: 'carteras' },
+    // Subcats Riñoneras
+    { id: 'rinoneras-rinoneras',  label: 'Riñoneras',  emoji: '🎽', parentId: 'rinoneras' },
+    { id: 'rinoneras-bandoleras', label: 'Bandoleras', emoji: '🎽', parentId: 'rinoneras' },
+    { id: 'rinoneras-crossbody',  label: 'Crossbody',  emoji: '🎽', parentId: 'rinoneras' },
+    // Subcats Loncheras
+    { id: 'loncheras-loncheras', label: 'Loncheras',           emoji: '🍱', parentId: 'loncheras' },
+    { id: 'loncheras-termicos',  label: 'Bolsos térmicos',     emoji: '🍱', parentId: 'loncheras' },
+    { id: 'loncheras-botellas',  label: 'Botellas deportivas', emoji: '🍱', parentId: 'loncheras' },
+    { id: 'loncheras-termos',    label: 'Termos',              emoji: '🍱', parentId: 'loncheras' },
+    // Subcats Accesorios
+    { id: 'accesorios-billeteras',    label: 'Billeteras',       emoji: '💼', parentId: 'accesorios' },
+    { id: 'accesorios-tarjeteros',    label: 'Tarjeteros',       emoji: '💼', parentId: 'accesorios' },
+    { id: 'accesorios-necesers',      label: 'Necesers',         emoji: '💼', parentId: 'accesorios' },
+    { id: 'accesorios-cosmeticos',    label: 'Porta cosméticos', emoji: '💼', parentId: 'accesorios' },
+    { id: 'accesorios-organizadores', label: 'Organizadores',    emoji: '💼', parentId: 'accesorios' },
+    // Subcats Viaje
+    { id: 'viaje-valijas',       label: 'Valijas',                emoji: '✈️', parentId: 'viaje' },
+    { id: 'viaje-organizadores', label: 'Organizadores de viaje', emoji: '✈️', parentId: 'viaje' },
+    { id: 'viaje-almohadas',     label: 'Almohadas de viaje',     emoji: '✈️', parentId: 'viaje' },
+    { id: 'viaje-cabina',        label: 'Mochilas de cabina',     emoji: '✈️', parentId: 'viaje' },
+    // Subcats Hombre
+    { id: 'hombre-mochilas',   label: 'Mochilas hombre',   emoji: '🧍‍♂️', parentId: 'hombre' },
+    { id: 'hombre-rinoneras',  label: 'Riñoneras hombre',  emoji: '🧍‍♂️', parentId: 'hombre' },
+    { id: 'hombre-billeteras', label: 'Billeteras hombre', emoji: '🧍‍♂️', parentId: 'hombre' },
+    // Subcats Mujer
+    { id: 'mujer-carteras',   label: 'Carteras',         emoji: '🧍‍♀️', parentId: 'mujer' },
+    { id: 'mujer-mochilas',   label: 'Mochilas mujer',   emoji: '🧍‍♀️', parentId: 'mujer' },
+    { id: 'mujer-accesorios', label: 'Accesorios mujer', emoji: '🧍‍♀️', parentId: 'mujer' },
+    // Subcats Ofertas
+    { id: 'ofertas-descuentos', label: 'Descuentos',       emoji: '🔥', parentId: 'ofertas' },
+    { id: 'ofertas-ultimas',    label: 'Últimas unidades', emoji: '🔥', parentId: 'ofertas' },
+    { id: 'ofertas-promos',     label: 'Promociones',      emoji: '🔥', parentId: 'ofertas' }
   ],
   async getCategories() {
     if (_isFresh('categories')) return _cache.categories;
@@ -307,10 +358,25 @@ const DB = {
     if (error || !data || data.length === 0) {
       _cache.categories = this.DEFAULT_CATEGORIES;
     } else {
-      _cache.categories = data.map(c => ({ id: c.id, label: c.label, emoji: c.emoji || '📦' }));
+      _cache.categories = data.map(c => ({
+        id: c.id,
+        label: c.label,
+        emoji: c.emoji || '📦',
+        parentId: c.parent_id || null
+      }));
     }
     _cache.categoriesAt = Date.now();
     return _cache.categories;
+  },
+  // Helpers de árbol
+  async getTopCategories() {
+    const all = await this.getCategories();
+    return all.filter(c => !c.parentId);
+  },
+  async getSubcategories(parentId) {
+    if (!parentId) return [];
+    const all = await this.getCategories();
+    return all.filter(c => c.parentId === parentId);
   },
   async saveCategories(cats) {
     // upsert categorías nuevas/modificadas + borra las que ya no están
@@ -321,7 +387,19 @@ const DB = {
       await sb.from('categories').delete().neq('id', '___nada___');
     }
     if (cats.length) {
-      const rows = cats.map((c, i) => ({ id: c.id, label: c.label, emoji: c.emoji || '📦', position: i }));
+      // Ordenamos: primero padres (parentId null) para que las FKs no fallen al upsertear hijos
+      const sorted = [...cats].sort((a, b) => {
+        if (!a.parentId && b.parentId) return -1;
+        if (a.parentId && !b.parentId) return 1;
+        return 0;
+      });
+      const rows = sorted.map((c, i) => ({
+        id: c.id,
+        label: c.label,
+        emoji: c.emoji || '📦',
+        position: typeof c.position === 'number' ? c.position : i,
+        parent_id: c.parentId || null
+      }));
       const { error } = await sb.from('categories').upsert(rows);
       if (error) throw error;
     }
@@ -497,11 +575,22 @@ const Cart = {
     msg += `\n*TOTAL: ${formatPrice(this.total())}*\n\n¿Cómo puedo coordinar el pago y el envío?`;
     return `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(msg)}`;
   },
-  async saveOrderFromCart() {
+  async saveOrderFromCart(paymentMethod = 'whatsapp') {
     const items = this.get();
     if (!items.length) return;
     try {
-      await DB.addOrder({ items: [...items], total: this.total(), customer: 'Cliente WhatsApp' });
+      const labels = {
+        whatsapp: 'Cliente WhatsApp',
+        mercado_pago: 'Cliente Mercado Pago',
+        naranja_x: 'Cliente Naranja X',
+        transferencia: 'Cliente Transferencia'
+      };
+      await DB.addOrder({
+        items: [...items],
+        total: this.total(),
+        customer: labels[paymentMethod] || 'Cliente',
+        paymentMethod
+      });
     } catch (e) { console.warn('No se pudo guardar el pedido', e); }
   }
 };

@@ -306,11 +306,15 @@
 <nav class="main-nav">
   <div class="nav-inner">
     <a href="tienda.html" id="nav-all">Todos</a>
-    <a href="tienda.html?cat=botellas" id="nav-botellas">🧴 Botellas y Termos</a>
-    <a href="tienda.html?cat=mochilas" id="nav-mochilas">🎒 Mochilas</a>
-    <a href="tienda.html?cat=carteras" id="nav-carteras">👜 Carteras y Bolsos</a>
-    <a href="tienda.html?cat=valijas" id="nav-valijas">🧳 Valijas y Viaje</a>
-    <a href="tienda.html?badge=sale" id="nav-sale" style="color:var(--orange-light)">🔥 Ofertas</a>
+    <a href="tienda.html?cat=mochilas">🎒 Mochilas</a>
+    <a href="tienda.html?cat=carteras">👜 Carteras y Bolsos</a>
+    <a href="tienda.html?cat=rinoneras">🎽 Riñoneras</a>
+    <a href="tienda.html?cat=loncheras">🍱 Loncheras y Térmicos</a>
+    <a href="tienda.html?cat=accesorios">💼 Accesorios</a>
+    <a href="tienda.html?cat=viaje">✈️ Viaje</a>
+    <a href="tienda.html?cat=hombre">🧍‍♂️ Hombre</a>
+    <a href="tienda.html?cat=mujer">🧍‍♀️ Mujer</a>
+    <a href="tienda.html?cat=ofertas" style="color:var(--orange-light)">🔥 Ofertas</a>
   </div>
 </nav>
 
@@ -421,11 +425,13 @@
       <div class="footer-col">
         <h4>Productos</h4>
         <ul>
-          <li><a href="tienda.html?cat=botellas">Botellas y Termos</a></li>
           <li><a href="tienda.html?cat=mochilas">Mochilas</a></li>
           <li><a href="tienda.html?cat=carteras">Carteras y Bolsos</a></li>
-          <li><a href="tienda.html?cat=valijas">Valijas y Viaje</a></li>
-          <li><a href="tienda.html?badge=sale">Ofertas</a></li>
+          <li><a href="tienda.html?cat=rinoneras">Riñoneras y Bandoleras</a></li>
+          <li><a href="tienda.html?cat=loncheras">Loncheras y Térmicos</a></li>
+          <li><a href="tienda.html?cat=accesorios">Accesorios</a></li>
+          <li><a href="tienda.html?cat=viaje">Viaje</a></li>
+          <li><a href="tienda.html?cat=ofertas">🔥 Ofertas</a></li>
         </ul>
       </div>
       <div class="footer-col">
@@ -460,6 +466,7 @@
 <script>
   // State
   let currentCat = '';
+  let currentSub = '';
   let currentBadge = '';
   let currentSearch = '';
   let currentView = 'grid';
@@ -470,6 +477,7 @@
   document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     currentCat = params.get('cat') || '';
+    currentSub = params.get('sub') || '';
     currentBadge = params.get('badge') || '';
     currentSearch = params.get('q') || '';
 
@@ -492,24 +500,53 @@
     applyFilters();
   });
 
+  function countProductsForCat(catId) {
+    // Cuenta productos cuya category O subcategory coincide; incluye también
+    // las subcategorías hijas si catId es padre.
+    const subs = allCategories.filter(c => c.parentId === catId).map(c => c.id);
+    return allProducts.filter(p =>
+      p.category === catId || p.subcategory === catId ||
+      (subs.length && subs.includes(p.subcategory))
+    ).length;
+  }
+
   function buildSidebarCats() {
-    const cats = allCategories;
+    const tops = allCategories.filter(c => !c.parentId);
     const container = document.getElementById('sidebar-cats');
     const allCount = allProducts.length;
 
     let html = `
-      <button class="cat-filter-btn ${!currentCat ? 'active' : ''}" data-cat="" onclick="setCategory('')">
+      <button class="cat-filter-btn ${(!currentCat && !currentSub) ? 'active' : ''}" onclick="setCategory('')">
         <i class="fas fa-th-large"></i> Todos los productos
         <span class="cat-count">${allCount}</span>
       </button>`;
 
-    cats.forEach(cat => {
-      const count = allProducts.filter(p => p.category === cat.id).length;
+    tops.forEach(cat => {
+      const subs = allCategories.filter(c => c.parentId === cat.id);
+      const isActiveCat = currentCat === cat.id;
+      const isExpanded = isActiveCat || subs.some(s => s.id === currentSub);
+      const count = countProductsForCat(cat.id);
+
       html += `
-        <button class="cat-filter-btn ${currentCat === cat.id ? 'active' : ''}" data-cat="${cat.id}" onclick="setCategory('${cat.id}')">
+        <button class="cat-filter-btn ${(isActiveCat && !currentSub) ? 'active' : ''}" onclick="setCategory('${cat.id}')">
           ${cat.emoji} ${cat.label}
           <span class="cat-count">${count}</span>
         </button>`;
+
+      if (subs.length && isExpanded) {
+        html += `<div style="margin:4px 0 8px 14px;border-left:2px solid var(--border);padding-left:8px">`;
+        subs.forEach(sub => {
+          const sCount = allProducts.filter(p => p.subcategory === sub.id).length;
+          html += `
+            <button class="cat-filter-btn ${currentSub === sub.id ? 'active' : ''}"
+              style="font-size:13px;padding:6px 10px"
+              onclick="setSubcategory('${cat.id}','${sub.id}')">
+              ${sub.label}
+              <span class="cat-count">${sCount}</span>
+            </button>`;
+        });
+        html += `</div>`;
+      }
     });
 
     container.innerHTML = html;
@@ -517,19 +554,36 @@
 
   function updateBreadcrumb() {
     const cats = allCategories;
-    const found = cats.find(c => c.id === currentCat);
+    const foundCat = cats.find(c => c.id === currentCat);
+    const foundSub = cats.find(c => c.id === currentSub);
     const badgeLabels = { sale: 'Ofertas 🔥', new: 'Novedades ✨' };
-    let label = currentSearch
-      ? `Búsqueda: "${currentSearch}"`
-      : (currentBadge ? badgeLabels[currentBadge] : (found ? found.label : 'Todos los productos'));
+
+    let label = '';
+    if (currentSearch) label = `Búsqueda: "${currentSearch}"`;
+    else if (foundSub && foundCat) label = `${foundCat.label} → ${foundSub.label}`;
+    else if (foundSub) label = foundSub.label;
+    else if (foundCat) label = foundCat.label;
+    else if (currentBadge) label = badgeLabels[currentBadge];
+    else label = 'Todos los productos';
+
     document.getElementById('breadcrumb-current').textContent = label;
   }
 
   function applyFilters() {
     let filtered = [...allProducts];
 
-    // Category
-    if (currentCat) filtered = filtered.filter(p => p.category === currentCat);
+    // Category (incluye productos cuya subcategory pertenezca a esta cat madre)
+    if (currentCat) {
+      const childIds = allCategories.filter(c => c.parentId === currentCat).map(c => c.id);
+      filtered = filtered.filter(p =>
+        p.category === currentCat ||
+        p.subcategory === currentCat ||
+        (childIds.length && childIds.includes(p.subcategory))
+      );
+    }
+
+    // Subcategoría exacta
+    if (currentSub) filtered = filtered.filter(p => p.subcategory === currentSub);
 
     // Badge
     if (currentBadge) filtered = filtered.filter(p => p.badge === currentBadge);
@@ -540,7 +594,8 @@
       filtered = filtered.filter(p =>
         p.name.toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q)
+        (p.category || '').toLowerCase().includes(q) ||
+        (p.subcategory || '').toLowerCase().includes(q)
       );
     }
 
@@ -585,8 +640,12 @@
     let chips = '';
     if (currentSearch) chips += `<span class="filter-chip" onclick="clearSearch()">🔍 "${currentSearch}" ✕</span>`;
     if (currentCat) {
-      const labels = { botellas:'Botellas', mochilas:'Mochilas', carteras:'Carteras', valijas:'Valijas' };
-      chips += `<span class="filter-chip" onclick="setCategory('')">${labels[currentCat]} ✕</span>`;
+      const c = allCategories.find(x => x.id === currentCat);
+      chips += `<span class="filter-chip" onclick="setCategory('')">${c ? c.emoji+' '+c.label : currentCat} ✕</span>`;
+    }
+    if (currentSub) {
+      const s = allCategories.find(x => x.id === currentSub);
+      chips += `<span class="filter-chip" onclick="setSubcategory(currentCat,'')">${s ? s.label : currentSub} ✕</span>`;
     }
     if (currentBadge) {
       chips += `<span class="filter-chip" onclick="setBadge('')">${currentBadge === 'sale' ? '🔥 Ofertas' : '✨ Novedades'} ✕</span>`;
@@ -596,7 +655,17 @@
 
   function setCategory(cat) {
     currentCat = cat;
+    currentSub = ''; // resetear sub al cambiar de cat madre
     buildSidebarCats(); // rebuilds with correct active state
+    updateBreadcrumb();
+    applyFilters();
+    updateURL();
+  }
+
+  function setSubcategory(cat, sub) {
+    currentCat = cat || '';
+    currentSub = sub || '';
+    buildSidebarCats();
     updateBreadcrumb();
     applyFilters();
     updateURL();
@@ -622,6 +691,7 @@
 
   function clearAllFilters() {
     currentCat = '';
+    currentSub = '';
     currentBadge = '';
     currentSearch = '';
     document.getElementById('price-min').value = '';
@@ -638,6 +708,7 @@
   function updateURL() {
     const params = new URLSearchParams();
     if (currentCat) params.set('cat', currentCat);
+    if (currentSub) params.set('sub', currentSub);
     if (currentBadge) params.set('badge', currentBadge);
     if (currentSearch) params.set('q', currentSearch);
     const newURL = window.location.pathname + (params.toString() ? '?' + params.toString() : '');

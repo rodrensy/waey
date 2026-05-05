@@ -705,11 +705,53 @@
       .admin-sidebar { width: 200px; }
       .admin-main { margin-left: 200px; max-width: calc(100% - 200px); padding: 20px; }
     }
+    /* ===== MOBILE: hamburguesa + drawer ===== */
+    .mobile-menu-btn {
+      display: none;
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      z-index: 9999;
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--orange);
+      color: #fff;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-size: 20px;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+    }
+    .sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 90;
+    }
+    .sidebar-backdrop.open { display: block; }
     @media (max-width: 600px) {
-      .admin-sidebar { display: none; }
-      .admin-main { margin-left: 0; max-width: 100%; }
+      .admin-sidebar {
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 100;
+      }
+      .admin-sidebar.open { transform: translateX(0); }
+      .admin-main {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 64px 16px 16px; /* espacio para el botón hamburguesa */
+      }
+      .mobile-menu-btn { display: flex; }
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .form-row-2 { grid-template-columns: 1fr; }
+      /* form de producto en una sola columna en mobile */
+      .admin-page [style*="grid-template-columns:1fr 360px"] { grid-template-columns: 1fr !important; }
+      /* alta de categorías en mobile: stack */
+      .config-card [style*="grid-template-columns:72px 1fr 1fr 1fr auto"] { grid-template-columns: 1fr !important; gap: 8px; }
     }
   </style>
 </head>
@@ -748,9 +790,14 @@
 
 <!-- ADMIN PANEL -->
 <div class="admin-page" id="admin-page">
+  <!-- Botón hamburguesa SOLO mobile -->
+  <button class="mobile-menu-btn" id="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Abrir menú">
+    <i class="fas fa-bars"></i>
+  </button>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="toggleSidebar()"></div>
   <div class="admin-layout">
     <!-- SIDEBAR -->
-    <aside class="admin-sidebar">
+    <aside class="admin-sidebar" id="admin-sidebar">
       <div class="admin-sidebar-logo">
         WAEY
         <span>Admin Panel</span>
@@ -858,10 +905,18 @@
               <div class="form-row-2">
                 <div class="form-group">
                   <label>Categoría <span class="req">*</span></label>
-                  <select id="f-category" class="form-control">
+                  <select id="f-category" class="form-control" onchange="onCategoryChange('f')">
                     <option value="">Seleccionar...</option>
                   </select>
                 </div>
+                <div class="form-group">
+                  <label>Subcategoría</label>
+                  <select id="f-subcategory" class="form-control" disabled>
+                    <option value="">— Elegí primero una categoría —</option>
+                  </select>
+                </div>
+              </div>
+              <div class="form-row-2">
                 <div class="form-group">
                   <label>Badge / Etiqueta</label>
                   <select id="f-badge" class="form-control">
@@ -869,6 +924,9 @@
                     <option value="new">✨ Nuevo</option>
                     <option value="sale">🔥 Oferta</option>
                   </select>
+                </div>
+                <div class="form-group">
+                  <!-- spacer para alineación -->
                 </div>
               </div>
             </div>
@@ -930,7 +988,7 @@
               <!-- File upload -->
               <div class="img-upload-area" onclick="document.getElementById('img-file-input').click()">
                 <i class="fas fa-cloud-upload-alt"></i>
-                <p>Hacé clic para subir fotos desde tu computadora<br><small style="color:#bbb">(JPG, PNG, WEBP – máx. 2MB c/u)</small></p>
+                <p>Hacé clic para subir fotos desde tu computadora<br><small style="color:#bbb">(JPG, PNG, WEBP – máx. 5MB c/u)</small></p>
               </div>
               <input type="file" id="img-file-input" accept="image/*" multiple style="display:none" onchange="handleImageUpload(event)">
 
@@ -1042,20 +1100,20 @@
 
         <!-- CATEGORÍAS -->
         <div class="config-card">
-          <h3>🗂️ Categorías de productos</h3>
+          <h3>🗂️ Categorías y subcategorías</h3>
           <p style="font-size:13px;color:var(--gray);margin-bottom:16px">
-            Agregá, editá o eliminá las categorías. Los productos existentes mantienen su categoría aunque cambies el nombre.
+            Agregá, editá o eliminá las categorías y sus subcategorías. Los productos existentes mantienen su categoría aunque cambies el nombre.
           </p>
 
-          <!-- Lista de categorías existentes -->
+          <!-- Lista de categorías existentes (árbol padre → hijos) -->
           <div id="categories-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px"></div>
 
           <!-- Formulario para agregar nueva -->
           <div style="background:var(--light);border-radius:10px;padding:16px">
             <div style="font-size:13px;font-weight:700;margin-bottom:12px;color:var(--black)">
-              <i class="fas fa-plus-circle" style="color:var(--orange)"></i> Nueva categoría
+              <i class="fas fa-plus-circle" style="color:var(--orange)"></i> Nueva categoría o subcategoría
             </div>
-            <div style="display:grid;grid-template-columns:72px 1fr 1fr auto;gap:10px;align-items:flex-end">
+            <div style="display:grid;grid-template-columns:72px 1fr 1fr 1fr auto;gap:10px;align-items:flex-end">
               <div>
                 <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Emoji</label>
                 <input type="text" id="new-cat-emoji" class="form-control" placeholder="📦" maxlength="4"
@@ -1068,7 +1126,13 @@
               </div>
               <div>
                 <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">Nombre visible</label>
-                <input type="text" id="new-cat-label" class="form-control" placeholder="ej: Accesorios de viaje">
+                <input type="text" id="new-cat-label" class="form-control" placeholder="ej: Necesers">
+              </div>
+              <div>
+                <label style="font-size:12px;font-weight:600;display:block;margin-bottom:5px">¿Subcategoría de…?</label>
+                <select id="new-cat-parent" class="form-control">
+                  <option value="">— Categoría principal —</option>
+                </select>
               </div>
               <div>
                 <button class="btn btn-primary btn-sm" onclick="addCategory()" style="white-space:nowrap;height:40px">
@@ -1274,6 +1338,21 @@
     if (name === 'config') await loadConfig();
     if (name === 'add-product') { resetForm(); }
     if (name === 'reports') { await renderReports(); }
+    // Cerrar drawer móvil al elegir una opción
+    if (window.matchMedia('(max-width: 600px)').matches) closeSidebar();
+  }
+
+  // ===== Drawer mobile =====
+  function toggleSidebar() {
+    const sb = document.getElementById('admin-sidebar');
+    const bd = document.getElementById('sidebar-backdrop');
+    if (!sb) return;
+    const isOpen = sb.classList.toggle('open');
+    bd.classList.toggle('open', isOpen);
+  }
+  function closeSidebar() {
+    document.getElementById('admin-sidebar')?.classList.remove('open');
+    document.getElementById('sidebar-backdrop')?.classList.remove('open');
   }
 
   // ===== DASHBOARD =====
@@ -1460,8 +1539,8 @@
     const previews = document.getElementById('img-previews');
 
     for (const file of files) {
-      if (file.size > 2 * 1024 * 1024) {
-        showToast(`${file.name} supera los 2MB`, 'error');
+      if (file.size > 5 * 1024 * 1024) {
+        showToast(`${file.name} supera los 5MB`, 'error');
         continue;
       }
 
@@ -1526,6 +1605,7 @@
     const name = document.getElementById('f-name').value.trim();
     const desc = document.getElementById('f-desc').value.trim();
     const category = document.getElementById('f-category').value;
+    const subcategory = document.getElementById('f-subcategory').value || null;
     const price = parseFloat(document.getElementById('f-price').value);
     const oldPrice = parseFloat(document.getElementById('f-old-price').value) || null;
     const stock = parseInt(document.getElementById('f-stock').value) || 0;
@@ -1540,7 +1620,7 @@
     if (!price || isNaN(price)) { showToast('Ingresá un precio válido', 'error'); return; }
     if (!images.length) { showToast('Agregá al menos una imagen', 'error'); return; }
 
-    const data = { name, description: desc, category, price, oldPrice, stock, badge, active, rating, reviews: 0, images, features };
+    const data = { name, description: desc, category, subcategory, price, oldPrice, stock, badge, active, rating, reviews: 0, images, features };
 
     try {
       if (editingId) {
@@ -1563,6 +1643,11 @@
     document.getElementById('f-name').value = '';
     document.getElementById('f-desc').value = '';
     document.getElementById('f-category').value = '';
+    const fSub = document.getElementById('f-subcategory');
+    if (fSub) {
+      fSub.innerHTML = '<option value="">— Elegí primero una categoría —</option>';
+      fSub.disabled = true;
+    }
     document.getElementById('f-badge').value = '';
     document.getElementById('f-price').value = '';
     document.getElementById('f-old-price').value = '';
@@ -1576,6 +1661,29 @@
     document.getElementById('save-btn-text').textContent = 'Guardar producto';
     addImageUrl();
     addFeatureRow(); addFeatureRow(); addFeatureRow();
+  }
+
+  // Cuando cambia la categoría madre, repuebla las subcategorías
+  async function onCategoryChange(prefix) {
+    const catSel = document.getElementById(prefix + '-category');
+    const subSel = document.getElementById(prefix + '-subcategory');
+    if (!catSel || !subSel) return;
+    const parentId = catSel.value;
+    const cats = await DB.getCategories();
+    const subs = cats.filter(c => c.parentId === parentId);
+    if (!parentId) {
+      subSel.innerHTML = '<option value="">— Elegí primero una categoría —</option>';
+      subSel.disabled = true;
+      return;
+    }
+    if (subs.length === 0) {
+      subSel.innerHTML = '<option value="">— Sin subcategorías —</option>';
+      subSel.disabled = true;
+      return;
+    }
+    subSel.disabled = false;
+    subSel.innerHTML = '<option value="">— Sin subcategoría —</option>' +
+      subs.map(s => `<option value="${s.id}">${s.emoji} ${s.label}</option>`).join('');
   }
 
   // ===== EDIT MODAL =====
@@ -1598,10 +1706,19 @@
       <div class="form-row-2">
         <div class="form-group">
           <label>Categoría</label>
-          <select id="m-category" class="form-control">
-            ${cats.map(c => `<option value="${c.id}" ${p.category===c.id?'selected':''}>${c.emoji} ${c.label}</option>`).join('')}
+          <select id="m-category" class="form-control" onchange="onCategoryChange('m')">
+            ${cats.filter(c=>!c.parentId).map(c => `<option value="${c.id}" ${p.category===c.id?'selected':''}>${c.emoji} ${c.label}</option>`).join('')}
           </select>
         </div>
+        <div class="form-group">
+          <label>Subcategoría</label>
+          <select id="m-subcategory" class="form-control">
+            <option value="">— Sin subcategoría —</option>
+            ${cats.filter(c=>c.parentId===p.category).map(c => `<option value="${c.id}" ${p.subcategory===c.id?'selected':''}>${c.emoji} ${c.label}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-row-2">
         <div class="form-group">
           <label>Badge</label>
           <select id="m-badge" class="form-control">
@@ -1610,6 +1727,7 @@
             <option value="sale" ${p.badge==='sale'?'selected':''}>🔥 Oferta</option>
           </select>
         </div>
+        <div class="form-group"></div>
       </div>
       <div class="form-row-2">
         <div class="form-group">
@@ -1658,6 +1776,7 @@
         name: document.getElementById('m-name').value.trim(),
         description: document.getElementById('m-desc').value.trim(),
         category: document.getElementById('m-category').value,
+        subcategory: document.getElementById('m-subcategory').value || null,
         badge: document.getElementById('m-badge').value || null,
         price: parseFloat(document.getElementById('m-price').value) || 0,
         oldPrice: parseFloat(document.getElementById('m-old-price').value) || null,
@@ -1708,7 +1827,8 @@
   }
 
   // ===== CATEGORY MANAGEMENT =====
-  const DEFAULT_CAT_IDS = ['botellas','mochilas','carteras','valijas'];
+  // Categorías "base" que no se pueden borrar (las top-level del catálogo)
+  const DEFAULT_CAT_IDS = ['mochilas','carteras','rinoneras','loncheras','accesorios','viaje','hombre','mujer','ofertas'];
 
   async function renderCategoriesList() {
     const cats = await DB.getCategories();
@@ -1716,35 +1836,54 @@
     const container = document.getElementById('categories-list');
     if (!container) return;
 
+    // Cuento productos por id (categoría O subcategoría)
     const countMap = {};
-    allProducts.forEach(p => { countMap[p.category] = (countMap[p.category] || 0) + 1; });
+    allProducts.forEach(p => {
+      countMap[p.category]    = (countMap[p.category]    || 0) + 1;
+      if (p.subcategory) countMap[p.subcategory] = (countMap[p.subcategory] || 0) + 1;
+    });
 
-    container.innerHTML = cats.map((cat, idx) => `
-      <div class="category-row ${DEFAULT_CAT_IDS.includes(cat.id) ? 'default-cat' : ''}" id="cat-row-${cat.id}" draggable="true"
-        ondragstart="dragStart(event,'${cat.id}')" ondragover="event.preventDefault()" ondrop="dragDrop(event,'${cat.id}')">
+    // Ordenar como árbol: padres → hijos
+    const tops = cats.filter(c => !c.parentId);
+    const tree = [];
+    tops.forEach(top => {
+      tree.push(top);
+      cats.filter(c => c.parentId === top.id).forEach(sub => tree.push(sub));
+    });
+    // Por si quedó alguna huérfana
+    cats.filter(c => c.parentId && !tops.find(t => t.id === c.parentId)).forEach(o => tree.push(o));
+
+    container.innerHTML = tree.map(cat => {
+      const isSub = !!cat.parentId;
+      const isProtected = DEFAULT_CAT_IDS.includes(cat.id);
+      return `
+      <div class="category-row ${isProtected ? 'default-cat' : ''}" id="cat-row-${cat.id}" draggable="true"
+        ondragstart="dragStart(event,'${cat.id}')" ondragover="event.preventDefault()" ondrop="dragDrop(event,'${cat.id}')"
+        style="${isSub ? 'margin-left:36px;background:#fafbff;' : ''}">
         <span class="cat-drag-handle" title="Arrastrar para reordenar">⠿</span>
+        ${isSub ? '<span style="color:var(--accent);font-size:13px;flex-shrink:0">↳</span>' : ''}
         <input class="cat-emoji-edit" type="text" value="${cat.emoji}" maxlength="4"
           onchange="updateCategoryField('${cat.id}','emoji',this.value)" placeholder="📦"
           style="text-align:center;font-size:18px">
-        <span class="cat-id-badge">${cat.id}</span>
+        <span class="cat-id-badge" title="${isSub ? 'Subcategoría de '+cat.parentId : 'Categoría principal'}">${cat.id}</span>
         <input class="cat-label-input" type="text" value="${cat.label}"
           onchange="updateCategoryField('${cat.id}','label',this.value)"
-          placeholder="Nombre de la categoría">
+          placeholder="Nombre">
         <span style="font-size:12px;color:var(--gray);flex-shrink:0">
-          ${countMap[cat.id] || 0} productos
+          ${countMap[cat.id] || 0} prod.
         </span>
-        ${!DEFAULT_CAT_IDS.includes(cat.id) ? `
+        ${!isProtected ? `
           <button class="btn-delete" style="padding:5px 10px;font-size:12px;flex-shrink:0"
-            onclick="deleteCategory('${cat.id}')" title="Eliminar categoría">
+            onclick="deleteCategory('${cat.id}')" title="${isSub ? 'Eliminar subcategoría' : 'Eliminar categoría'}">
             <i class="fas fa-trash"></i>
           </button>
         ` : `
           <span style="width:60px;flex-shrink:0"></span>
         `}
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
 
-    // Also refresh the product form dropdown
+    // Refresh dropdowns y selector "padre" del form de nueva categoría
     await refreshCategoryDropdowns();
   }
 
@@ -1766,6 +1905,7 @@
     const emoji = document.getElementById('new-cat-emoji').value.trim() || '📦';
     const id    = document.getElementById('new-cat-id').value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
     const label = document.getElementById('new-cat-label').value.trim();
+    const parentId = document.getElementById('new-cat-parent').value || null;
 
     if (!id)    { showToast('Ingresá un ID para la categoría', 'error'); return; }
     if (!label) { showToast('Ingresá el nombre de la categoría', 'error'); return; }
@@ -1775,7 +1915,7 @@
       showToast('Ya existe una categoría con ese ID', 'error'); return;
     }
 
-    cats.push({ id, label, emoji });
+    cats.push({ id, label, emoji, parentId });
     try {
       await DB.saveCategories(cats);
 
@@ -1783,9 +1923,11 @@
       document.getElementById('new-cat-emoji').value = '';
       document.getElementById('new-cat-id').value = '';
       document.getElementById('new-cat-label').value = '';
+      document.getElementById('new-cat-parent').value = '';
 
       await renderCategoriesList();
-      showToast(`Categoría "${label}" creada 🎉`, 'success');
+      const tipo = parentId ? 'Subcategoría' : 'Categoría';
+      showToast(`${tipo} "${label}" creada 🎉`, 'success');
     } catch (err) {
       showToast('Error: ' + err.message, 'error');
     }
@@ -1794,17 +1936,25 @@
   async function deleteCategory(catId) {
     const allCats = await DB.getCategories();
     const allProducts = await DB.getProducts();
-    const count = allProducts.filter(p => p.category === catId).length;
+    const count = allProducts.filter(p => p.category === catId || p.subcategory === catId).length;
+    const childCount = allCats.filter(c => c.parentId === catId).length;
     const cat = allCats.find(c => c.id === catId);
-    const msg = count > 0
-      ? `¿Eliminar la categoría "${cat?.label}"? Tiene ${count} producto${count>1?'s':''} asignados — quedarán sin categoría.`
-      : `¿Eliminar la categoría "${cat?.label}"?`;
+
+    let msg = `¿Eliminar "${cat?.label}"?`;
+    const advert = [];
+    if (count > 0) advert.push(`${count} producto${count>1?'s':''} la usa${count>1?'n':''}`);
+    if (childCount > 0) advert.push(`tiene ${childCount} subcategoría${childCount>1?'s':''} hija${childCount>1?'s':''} (también se borrarán)`);
+    if (advert.length) msg += ' ' + advert.join(' y ') + '.';
+
     if (!confirm(msg)) return;
 
     try {
-      await DB.saveCategories(allCats.filter(c => c.id !== catId));
+      // Borramos la categoría + todas sus hijas en cascada
+      const idsAEliminar = new Set([catId]);
+      allCats.filter(c => c.parentId === catId).forEach(c => idsAEliminar.add(c.id));
+      await DB.saveCategories(allCats.filter(c => !idsAEliminar.has(c.id)));
       await renderCategoriesList();
-      showToast('Categoría eliminada', 'error');
+      showToast('Eliminado correctamente', 'error');
     } catch (err) {
       showToast('Error: ' + err.message, 'error');
     }
@@ -1832,14 +1982,32 @@
 
   async function refreshCategoryDropdowns() {
     const cats = await DB.getCategories();
+    const tops = cats.filter(c => !c.parentId);
     const optionsHTML = `<option value="">Seleccionar...</option>` +
-      cats.map(c => `<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
-    // Product form
+      tops.map(c => `<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
+    // Product form (categoría madre)
     const fCat = document.getElementById('f-category');
-    if (fCat) { const prev = fCat.value; fCat.innerHTML = optionsHTML; if (prev) fCat.value = prev; }
+    if (fCat) {
+      const prev = fCat.value;
+      fCat.innerHTML = optionsHTML;
+      if (prev) fCat.value = prev;
+      onCategoryChange('f');
+    }
     // Edit modal
     const mCat = document.getElementById('m-category');
-    if (mCat) { const prev = mCat.value; mCat.innerHTML = optionsHTML.replace('<option value="">Seleccionar...</option>',''); if (prev) mCat.value = prev; }
+    if (mCat) {
+      const prev = mCat.value;
+      mCat.innerHTML = optionsHTML.replace('<option value="">Seleccionar...</option>','');
+      if (prev) mCat.value = prev;
+    }
+    // Selector de padre en alta de categoría
+    const pSel = document.getElementById('new-cat-parent');
+    if (pSel) {
+      const prev = pSel.value;
+      pSel.innerHTML = '<option value="">— Categoría principal —</option>' +
+        tops.map(c => `<option value="${c.id}">${c.emoji} ${c.label}</option>`).join('');
+      if (prev) pSel.value = prev;
+    }
   }
 
   async function saveConfig() {
